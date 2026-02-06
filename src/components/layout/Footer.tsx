@@ -60,9 +60,9 @@ export default function Footer() {
         <footer id="contact" className="bg-slate-900 text-white">
             {/* Main Footer Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 mb-12">
-                    {/* Company Info - Takes 2 columns on large screens */}
-                    <div className="sm:col-span-2 lg:col-span-2">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12 lg:gap-8 mb-12">
+                    {/* Company Info - Takes 2 columns on mobile and large screens */}
+                    <div className="col-span-2 lg:col-span-2">
                         <Image
                             src="https://www.ultrawindows.co.uk/lovable-uploads/2a5b2ca2-19cf-408a-b7a2-9d9e3b9e31c0.png"
                             alt="Ultra Windows"
