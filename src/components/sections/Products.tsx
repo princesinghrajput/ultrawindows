@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { Reveal } from '../ui/Reveal';
 
 const doorProducts = [
     {
@@ -85,22 +86,28 @@ function ProductCard({ name, description, image, href }: ProductCardProps) {
 
 export default function Products() {
     return (
-        <section className="py-20 bg-slate-50">
+        <section className="py-16 md:py-20 lg:py-24 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Doors Section */}
                 <div className="mb-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                            Welcome to Ultra Windows & Bifolds
-                        </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            Premium aluminium and glazed doors, designed and manufactured in the UK
-                        </p>
+                        <Reveal width="100%">
+                            <div className="flex flex-col items-center">
+                                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                                    Welcome to Ultra Windows & Bifolds
+                                </h2>
+                                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                                    Premium aluminium and glazed doors, designed and manufactured in the UK
+                                </p>
+                            </div>
+                        </Reveal>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-                        {doorProducts.map((product) => (
-                            <ProductCard key={product.name} {...product} />
+                        {doorProducts.map((product, index) => (
+                            <Reveal key={product.name} delay={index * 100} width="100%">
+                                <ProductCard {...product} />
+                            </Reveal>
                         ))}
                     </div>
                 </div>
@@ -108,20 +115,26 @@ export default function Products() {
                 {/* Windows & Roof Section */}
                 <div>
                     <div className="text-center mb-12">
-                        <span className="inline-block text-orange-500 font-semibold text-sm uppercase tracking-wider mb-2">
-                            Premium Range
-                        </span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                            Windows & Roof Products
-                        </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            High-performance aluminium windows and roof solutions for modern homes
-                        </p>
+                        <Reveal width="100%">
+                            <div className="flex flex-col items-center">
+                                <span className="inline-block text-orange-500 font-semibold text-sm uppercase tracking-wider mb-2">
+                                    Premium Range
+                                </span>
+                                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                                    Windows & Roof Products
+                                </h2>
+                                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                                    High-performance aluminium windows and roof solutions for modern homes
+                                </p>
+                            </div>
+                        </Reveal>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
-                        {windowProducts.map((product) => (
-                            <ProductCard key={product.name} {...product} />
+                        {windowProducts.map((product, index) => (
+                            <Reveal key={product.name} delay={index * 100} width="100%">
+                                <ProductCard {...product} />
+                            </Reveal>
                         ))}
                     </div>
                 </div>

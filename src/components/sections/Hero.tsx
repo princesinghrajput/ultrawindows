@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, LogIn, Shield, Award, Truck } from 'lucide-react';
+import { Reveal } from '../ui/Reveal';
 
 const trustBadges = [
     { icon: Shield, text: '10 Year Guarantee' },
@@ -10,7 +11,7 @@ const trustBadges = [
 
 export default function Hero() {
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0">
                 <Image
@@ -26,54 +27,62 @@ export default function Hero() {
             </div>
 
             {/* Content - Centered */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 text-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 xl:py-20 text-center">
                 <div className="max-w-3xl mx-auto">
                     {/* Headline */}
-                    <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
-                        Premium Aluminium
-                        <span className="block text-orange-500 mt-2">Doors & Windows</span>
-                    </h1>
+                    <Reveal width="100%">
+                        <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
+                            Premium Aluminium
+                            <span className="block text-orange-500 mt-2">Doors & Windows</span>
+                        </h1>
+                    </Reveal>
 
                     {/* Subheadline */}
-                    <p className="text-base sm:text-lg text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto font-light">
-                        UK manufactured high-quality aluminium bifold doors, sliding patio doors,
-                        glazed doors and flat roof lights. Unmatched security and sleek design.
-                    </p>
+                    <Reveal delay={200} width="100%">
+                        <p className="text-base sm:text-lg text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto font-light">
+                            UK manufactured high-quality aluminium bifold doors, sliding patio doors,
+                            glazed doors and flat roof lights. Unmatched security and sleek design.
+                        </p>
+                    </Reveal>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
-                        <Link href="/design-quote">
-                            <button className="btn-primary text-sm sm:text-base w-full sm:w-auto px-8 py-3.5">
-                                Design & Quote
-                                <ArrowRight className="h-4 w-4" />
-                            </button>
-                        </Link>
-                        <a
-                            href="https://ultra-hazel.vercel.app/login"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <button className="btn-secondary text-sm sm:text-base w-full sm:w-auto px-8 py-3.5">
-                                <LogIn className="h-4 w-4" />
-                                Trade Login
-                            </button>
-                        </a>
-                    </div>
+                    <Reveal delay={400} width="100%">
+                        <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
+                            <Link href="/design-quote">
+                                <button className="btn-primary text-sm sm:text-base w-full sm:w-auto px-8 py-3.5">
+                                    Design & Quote
+                                    <ArrowRight className="h-4 w-4" />
+                                </button>
+                            </Link>
+                            <a
+                                href="https://ultra-hazel.vercel.app/login"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <button className="btn-secondary text-sm sm:text-base w-full sm:w-auto px-8 py-3.5">
+                                    <LogIn className="h-4 w-4" />
+                                    Trade Login
+                                </button>
+                            </a>
+                        </div>
+                    </Reveal>
 
                     {/* Trust Badges */}
-                    <div className="flex flex-wrap gap-3 md:gap-5 justify-center">
-                        {trustBadges.map((badge) => (
-                            <div
-                                key={badge.text}
-                                className="trust-badge"
-                            >
-                                <div className="trust-badge-icon w-7 h-7">
-                                    <badge.icon className="h-3.5 w-3.5 text-orange-400" />
+                    <Reveal delay={600} width="100%">
+                        <div className="flex flex-wrap gap-3 md:gap-5 justify-center">
+                            {trustBadges.map((badge) => (
+                                <div
+                                    key={badge.text}
+                                    className="trust-badge"
+                                >
+                                    <div className="trust-badge-icon w-7 h-7">
+                                        <badge.icon className="h-3.5 w-3.5 text-orange-400" />
+                                    </div>
+                                    <span className="text-xs sm:text-sm font-medium text-white">{badge.text}</span>
                                 </div>
-                                <span className="text-xs sm:text-sm font-medium text-white">{badge.text}</span>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </Reveal>
                 </div>
             </div>
 
