@@ -20,21 +20,21 @@ export default function CTA() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="font-heading text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-8 leading-tight tracking-tight">
+                    <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight tracking-tight">
                         Ready to Transform <br className="hidden sm:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-200">
                             Your Home?
                         </span>
                     </h2>
-                    <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
+                    <p className="text-base md:text-lg text-slate-300 mb-10 leading-relaxed max-w-2xl mx-auto font-light">
                         Get a free, no-obligation quote or speak to our experts about finding the perfect solution for your property.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/design-quote" className="w-full sm:w-auto">
-                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all duration-300 shadow-xl shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-1 text-lg group">
+                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all duration-300 shadow-xl shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-1 text-base group">
                                 Design & Quote
-                                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </Link>
                         <a
@@ -43,14 +43,14 @@ export default function CTA() {
                             rel="noopener noreferrer"
                             className="w-full sm:w-auto"
                         >
-                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-sm border border-white/10 hover:border-white/30 text-lg">
-                                <LogIn className="h-5 w-5" />
+                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all duration-300 backdrop-blur-sm border border-white/10 hover:border-white/30 text-base">
+                                <LogIn className="h-4 w-4" />
                                 Trade Login
                             </button>
                         </a>
                         <a href="tel:01707932189" className="w-full sm:w-auto">
-                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all duration-300 border border-slate-700 hover:border-slate-600 text-lg">
-                                <Phone className="h-5 w-5" />
+                            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all duration-300 border border-slate-700 hover:border-slate-600 text-base">
+                                <Phone className="h-4 w-4" />
                                 01707 932 189
                             </button>
                         </a>

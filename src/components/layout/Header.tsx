@@ -13,7 +13,9 @@ import {
     LogIn,
     Facebook,
     Instagram,
-    Linkedin
+    Linkedin,
+    Plus,
+    Minus
 } from 'lucide-react';
 
 const navigation = {
@@ -53,21 +55,21 @@ function NavDropdown({ title, items, isOpen, onToggle }: DropdownProps) {
         <div className="relative group">
             <button
                 onClick={onToggle}
-                onMouseEnter={onToggle}
+                onMouseEnter={() => !isOpen && onToggle()}
                 className="flex items-center gap-1 py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors group-hover:text-orange-500"
             >
                 {title}
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             <div
-                className={`absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-200/50 border border-white/20 py-3 z-50 transform transition-all duration-200 origin-top-left ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
-                onMouseLeave={onToggle}
+                className={`absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-50 transform transition-all duration-200 origin-top-left ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
+                onMouseLeave={() => isOpen && onToggle()}
             >
                 {items.map((item) => (
                     <Link
                         key={item.name}
                         href={item.href}
-                        className="block px-6 py-3 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium"
+                        className="block px-6 py-2.5 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 transition-colors font-medium"
                     >
                         {item.name}
                     </Link>
@@ -77,9 +79,50 @@ function NavDropdown({ title, items, isOpen, onToggle }: DropdownProps) {
     );
 }
 
+// Mobile specific accordion component
+function MobileNavItem({ title, items, isOpen, onToggle }: DropdownProps) {
+    return (
+        <div className="border-b border-slate-100 last:border-0">
+            <button
+                onClick={onToggle}
+                className="flex items-center justify-between w-full py-4 text-left text-lg font-medium text-slate-800"
+            >
+                {title}
+                {isOpen ? (
+                    <Minus className="h-5 w-5 text-orange-500" />
+                ) : (
+                    <Plus className="h-5 w-5 text-slate-400" />
+                )}
+            </button>
+            <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'}`}
+            >
+                <div className="flex flex-col space-y-3 pl-4 border-l-2 border-slate-100 ml-1">
+                    {items.map((item) => (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            className="text-base text-slate-600 hover:text-orange-500 py-1 block"
+                            onClick={(e) => {
+                                // Close menu logic handled in parent
+                            }}
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [mobileDropdowns, setMobileDropdowns] = useState<{ [key: string]: boolean }>({
+        products: true, // Default open for better discovery
+        company: false
+    });
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -96,7 +139,6 @@ export default function Header() {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
-            // Also reset scroll position of the drawer content if needed, but not critical
         }
         return () => { document.body.style.overflow = 'unset'; };
     }, [mobileMenuOpen]);
@@ -105,15 +147,19 @@ export default function Header() {
         setOpenDropdown(openDropdown === name ? null : name);
     };
 
+    const toggleMobileDropdown = (name: string) => {
+        setMobileDropdowns(prev => ({ ...prev, [name]: !prev[name] }));
+    };
+
     return (
         <>
-            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md border-b border-white/20' : 'bg-white shadow-sm'}`}>
-                {/* Top Bar - Made more compact on mobile */}
-                <div className={`bg-slate-900 text-white text-[10px] sm:text-xs md:text-sm py-1.5 md:py-2 transition-all duration-300 ${scrolled ? 'h-0 py-0 overflow-hidden opacity-0' : 'h-auto opacity-100'}`}>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                        <div className="flex items-center gap-3 md:gap-6">
+            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100' : 'bg-white border-b border-transparent'}`}>
+                {/* Top Bar */}
+                <div className={`bg-slate-900 text-white text-[10px] sm:text-xs font-medium transition-all duration-300 overflow-hidden ${scrolled ? 'h-0 opacity-0' : 'h-8 sm:h-9 opacity-100'}`}>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+                        <div className="flex items-center gap-4 sm:gap-6">
                             <a href="tel:01707932189" className="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
-                                <Phone className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                                <Phone className="h-3 w-3" />
                                 <span className="hidden sm:inline">01707 932 189</span>
                                 <span className="sm:hidden">Call Us</span>
                             </a>
@@ -121,34 +167,34 @@ export default function Header() {
                                 <WhatsAppIcon />
                                 <span className="hidden md:inline">+44 7350 452 948</span>
                             </a>
-                            <a href="mailto:sales@ultrawindows.co.uk" className="hidden lg:flex items-center gap-2 hover:text-orange-400 transition-colors">
+                            <a href="mailto:sales@ultrawindows.co.uk" className="hidden lg:flex items-center gap-1.5 hover:text-orange-400 transition-colors">
                                 <Mail className="h-3.5 w-3.5" />
                                 <span>sales@ultrawindows.co.uk</span>
                             </a>
                         </div>
-                        <div className="text-slate-400 font-medium hidden sm:block">
-                            UK Manufacturer | Free Delivery
+                        <div className="text-slate-400 hidden sm:block">
+                            Premium Aluminium Systems | Nationwide Delivery
                         </div>
                     </div>
                 </div>
 
                 {/* Main Navigation */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 md:h-20 transition-all duration-300">
+                    <div className="flex items-center justify-between h-16 md:h-20">
                         {/* Logo */}
-                        <Link href="/" className="flex-shrink-0 relative z-50">
+                        <Link href="/" className="flex-shrink-0 relative z-50" onClick={() => setMobileMenuOpen(false)}>
                             <Image
                                 src="https://www.ultrawindows.co.uk/lovable-uploads/4398d2ed-0fcc-43e9-ae06-9c93ed73deaa.png"
                                 alt="Ultra Windows"
-                                width={160}
-                                height={64}
-                                className="h-8 md:h-12 w-auto object-contain transition-all duration-300"
+                                width={180}
+                                height={60}
+                                className="h-8 md:h-10 w-auto object-contain"
                                 priority
                             />
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center gap-8">
+                        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
                             <Link href="/" className="py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors">
                                 Home
                             </Link>
@@ -168,7 +214,7 @@ export default function Header() {
                                 Rooflights
                             </Link>
                             <NavDropdown
-                                title="More"
+                                title="Company"
                                 items={navigation.more}
                                 isOpen={openDropdown === 'more'}
                                 onToggle={() => toggleDropdown('more')}
@@ -186,96 +232,120 @@ export default function Header() {
                                 Trade Login
                             </a>
                             <Link href="/design-quote">
-                                <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all duration-300 shadow-lg shadow-orange-500/30 hover:-translate-y-0.5 hover:shadow-orange-500/40">
-                                    Get a Quote
+                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:-translate-y-0.5">
+                                    Get Quote
                                     <ArrowRight className="h-4 w-4" />
                                 </button>
                             </Link>
                         </div>
 
-                        {/* Mobile Menu Button - Optimized Z-index */}
+                        {/* Mobile Menu Button */}
                         <button
-                            className="lg:hidden p-2 -mr-2 text-slate-700 relative z-50"
+                            className="lg:hidden p-2 -mr-2 text-slate-800 relative z-50 focus:outline-none"
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             aria-label="Toggle menu"
                         >
-                            <div className={`w-6 h-5 relative flex flex-col justify-between transition-all duration-300 ${mobileMenuOpen ? 'rotate-180' : ''}`}>
-                                <span className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                                <span className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
-                                <span className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`} />
-                            </div>
+                            {mobileMenuOpen ? (
+                                <X className="h-6 w-6" />
+                            ) : (
+                                <Menu className="h-6 w-6" />
+                            )}
                         </button>
                     </div>
                 </div>
             </header>
 
-            {/* Mobile Side Panel */}
-            <div className={`fixed inset-x-0 bottom-0 top-[64px] z-40 lg:hidden pointer-events-none`}>
+            {/* Mobile Menu Overlay */}
+            <div
+                className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            >
                 {/* Backdrop */}
                 <div
-                    className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 pointer-events-auto ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                     onClick={() => setMobileMenuOpen(false)}
                 />
 
-                {/* Drawer Panel */}
+                {/* Drawer */}
                 <div
-                    className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out pointer-events-auto flex flex-col border-l border-slate-100 ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    className={`absolute top-0 right-0 h-[100dvh] w-[85%] max-w-[320px] bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 >
-                    {/* Header inside drawer - Removed as the main header is visible */}
+                    {/* Drawer Header */}
+                    <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-white shrink-0">
+                        <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+                            <Image
+                                src="https://www.ultrawindows.co.uk/lovable-uploads/4398d2ed-0fcc-43e9-ae06-9c93ed73deaa.png"
+                                alt="Ultra Windows"
+                                width={140}
+                                height={48}
+                                className="h-8 w-auto object-contain"
+                            />
+                        </Link>
+                        <button
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="p-2 -mr-2 text-slate-500 hover:text-orange-500 transition-colors"
+                            aria-label="Close menu"
+                        >
+                            <X className="h-6 w-6" />
+                        </button>
+                    </div>
+
                     {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto py-6 px-6">
-                        <nav className="space-y-6">
-                            <Link href="/" className="block text-xl font-heading font-bold text-slate-900" onClick={() => setMobileMenuOpen(false)}>
+                        <nav className="flex flex-col space-y-1">
+                            <Link
+                                href="/"
+                                className="text-lg font-medium text-slate-800 py-3 border-b border-slate-100"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
                                 Home
                             </Link>
 
-                            <div className="space-y-3">
-                                <p className="text-xs font-bold text-orange-500 uppercase tracking-widest">Products</p>
-                                {navigation.doors.map((item) => (
-                                    <Link key={item.name} href={item.href} className="block text-lg text-slate-600 font-medium hover:text-orange-500" onClick={() => setMobileMenuOpen(false)}>
-                                        {item.name}
-                                    </Link>
-                                ))}
-                                {navigation.windows.map((item) => (
-                                    <Link key={item.name} href={item.href} className="block text-lg text-slate-600 font-medium hover:text-orange-500" onClick={() => setMobileMenuOpen(false)}>
-                                        {item.name}
-                                    </Link>
-                                ))}
-                                <Link href="/roof-lights" className="block text-lg text-slate-600 font-medium hover:text-orange-500" onClick={() => setMobileMenuOpen(false)}>
-                                    Rooflights
-                                </Link>
-                            </div>
+                            <MobileNavItem
+                                title="Our Products"
+                                items={[...navigation.doors, ...navigation.windows, { name: 'Rooflights', href: '/roof-lights' }]}
+                                isOpen={mobileDropdowns.products}
+                                onToggle={() => toggleMobileDropdown('products')}
+                                {...({} as any)}
+                            />
 
-                            <div className="space-y-3">
-                                <p className="text-xs font-bold text-orange-500 uppercase tracking-widest">Company</p>
-                                {navigation.more.map((item) => (
-                                    <Link key={item.name} href={item.href} className="block text-lg text-slate-600 font-medium hover:text-orange-500" onClick={() => setMobileMenuOpen(false)}>
-                                        {item.name}
-                                    </Link>
-                                ))}
+                            <MobileNavItem
+                                title="Company"
+                                items={navigation.more}
+                                isOpen={mobileDropdowns.company}
+                                onToggle={() => toggleMobileDropdown('company')}
+                                {...({} as any)}
+                            />
+
+                            <div className="pt-8 space-y-4">
+                                <Link
+                                    href="/design-quote"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="block w-full"
+                                >
+                                    <button className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition-transform">
+                                        Get a Free Quote
+                                        <ArrowRight className="h-5 w-5" />
+                                    </button>
+                                </Link>
+                                <a
+                                    href="https://ultra-hazel.vercel.app/login"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 w-full px-6 py-3.5 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors"
+                                >
+                                    <LogIn className="h-5 w-5" />
+                                    Trade Login
+                                </a>
                             </div>
                         </nav>
                     </div>
 
-                    {/* Footer inside drawer */}
-                    <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
-                        <Link href="/design-quote" onClick={() => setMobileMenuOpen(false)}>
-                            <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition-transform">
-                                Get a Free Quote
-                                <ArrowRight className="h-5 w-5" />
-                            </button>
-                        </Link>
-
-                        <div className="flex justify-center gap-6 pt-2">
-                            <a href="#" className="p-2 bg-white rounded-full text-slate-400 hover:text-orange-500 shadow-sm border border-slate-100">
-                                <Facebook className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="p-2 bg-white rounded-full text-slate-400 hover:text-orange-500 shadow-sm border border-slate-100">
-                                <Instagram className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="p-2 bg-white rounded-full text-slate-400 hover:text-orange-500 shadow-sm border border-slate-100">
-                                <Linkedin className="h-5 w-5" />
-                            </a>
+                    {/* Footer */}
+                    <div className="p-6 bg-slate-50 border-t border-slate-100 shrink-0">
+                        <div className="flex justify-center gap-8 text-slate-400">
+                            <a href="#" className="hover:text-orange-500 transition-colors"><Facebook className="h-5 w-5" /></a>
+                            <a href="#" className="hover:text-orange-500 transition-colors"><Instagram className="h-5 w-5" /></a>
+                            <a href="#" className="hover:text-orange-500 transition-colors"><Linkedin className="h-5 w-5" /></a>
                         </div>
                     </div>
                 </div>

@@ -1,85 +1,137 @@
 import Image from 'next/image';
-import { CircleCheckBig } from 'lucide-react';
+import { CircleCheckBig, Shield, Star, Users } from 'lucide-react';
+import { Reveal } from '../ui/Reveal';
+
+const stats = [
+    { label: 'Years Experience', value: '10+', icon: Star },
+    { label: 'Project Completed', value: '500+', icon: CircleCheckBig },
+    { label: 'Happy Clients', value: '100%', icon: Users },
+];
 
 const highlights = [
-    'Premium quality aluminium and glazed materials',
-    'Custom-made to your exact specifications',
-    'Advanced security features as standard',
-    'Industry-leading thermal performance',
-    'Nationwide delivery service',
-    'Expert installation guidance available',
+    {
+        title: 'Premium Materials',
+        description: 'High-grade aluminium and efficient glazing for lasting performance.'
+    },
+    {
+        title: 'Bespoke Design',
+        description: 'Custom-made to your exact specifications and style preferences.'
+    },
+    {
+        title: 'Advanced Security',
+        description: 'Multi-point locking systems for complete peace of mind.'
+    },
+    {
+        title: 'Thermal Efficiency',
+        description: 'Industry-leading ratings to keep your home warm and energy bills low.'
+    }
 ];
 
 export default function About() {
     return (
-        <section id="about" className="py-20 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
+        <section id="about" className="py-24 lg:py-32 bg-slate-50 relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-orange-500/5 rounded-bl-[100px] -z-10" />
+            <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-slate-200/50 rounded-tr-[80px] -z-10" />
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                    {/* Image */}
+                <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                    {/* Image Section */}
                     <div className="relative order-2 lg:order-1">
-                        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-                            <Image
-                                src="https://www.ultrawindows.co.uk/assets/bifold-doors-Xyy3pzwa.jpg"
-                                alt="Premium Aluminium Doors Installation"
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                            />
-                            {/* Decorative gradient overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/20 to-transparent" />
+                        <Reveal width="100%">
+                            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-slate-900/5 group">
+                                <Image
+                                    src="https://www.ultrawindows.co.uk/assets/bifold-doors-Xyy3pzwa.jpg"
+                                    alt="Premium Aluminium Doors Installation"
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-60" />
+                            </div>
+                        </Reveal>
+
+                        {/* Floating Experience Card */}
+                        <Reveal delay={200} className="absolute -bottom-10 -right-10 z-20 hidden md:block">
+                            <div className="bg-white p-6 rounded-2xl shadow-xl ring-1 ring-slate-100 max-w-xs transform transition-transform hover:-translate-y-1 duration-300">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
+                                        <Shield className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Guarantee</p>
+                                        <p className="text-xl font-bold text-slate-900">10 Years</p>
+                                    </div>
+                                </div>
+                                <p className="text-slate-600 text-sm leading-relaxed">
+                                    Every installation is backed by our comprehensive warranty for your peace of mind.
+                                </p>
+                            </div>
+                        </Reveal>
+
+                        {/* Decorative Dot Pattern */}
+                        <div className="absolute -top-12 -left-12 -z-10 opacity-20 hidden lg:block">
+                            <svg width="100" height="100" fill="none" viewBox="0 0 100 100">
+                                <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <circle cx="2" cy="2" r="2" className="text-slate-900" fill="currentColor" />
+                                </pattern>
+                                <rect width="100" height="100" fill="url(#dots)" />
+                            </svg>
                         </div>
-                        {/* Experience Badge */}
-                        <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-2xl shadow-xl hidden md:block transform hover:scale-105 transition-transform duration-300">
-                            <div className="text-4xl font-heading font-bold">10+</div>
-                            <div className="text-sm font-medium opacity-90">Years Experience</div>
-                        </div>
-                        {/* Decorative elements */}
-                        <div className="absolute -top-4 -left-4 w-24 h-24 bg-orange-100 rounded-2xl -z-10 hidden lg:block" />
-                        <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-slate-100 rounded-2xl -z-10 hidden lg:block" />
                     </div>
 
-                    {/* Content */}
+                    {/* Content Section */}
                     <div className="order-1 lg:order-2">
-                        <span className="inline-block text-orange-500 font-semibold text-sm uppercase tracking-wider mb-3">
-                            What We Do
-                        </span>
-                        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
-                            Crafting Premium{' '}
-                            <span className="text-orange-500">Aluminium Products</span>
-                        </h2>
+                        <Reveal width="100%">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-widest mb-6">
+                                <span className="w-2 h-2 rounded-full bg-orange-500" />
+                                About Us
+                            </div>
+                        </Reveal>
 
-                        <p className="text-lg text-slate-600 mb-5 leading-relaxed">
-                            We are a UK based manufacturer of high-quality aluminium bifold doors,
-                            french doors, sliding patio doors, glazed doors and flat roof lights.
-                            Our products are top of the range, offering unmatched security features
-                            and sleek finishing touches.
-                        </p>
+                        <Reveal delay={100} width="100%">
+                            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-[1.15]">
+                                Crafting Excellence in <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
+                                    Aluminium Glazing
+                                </span>
+                            </h2>
+                        </Reveal>
 
-                        <p className="text-slate-600 mb-5 leading-relaxed">
-                            Every product we manufacture is designed with precision engineering and
-                            crafted using premium materials. We take pride in delivering exceptional
-                            quality that transforms homes across the UK.
-                        </p>
+                        <Reveal delay={200} width="100%">
+                            <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-lg font-medium">
+                                We are a premier UK manufacturer dedicated to transforming homes with high-performance aluminium bifold doors, sliding systems, and roof lights. Innovative design meets precision engineering.
+                            </p>
+                        </Reveal>
 
-                        <p className="text-slate-600 mb-8 leading-relaxed">
-                            Our mission is to enhance homes with sustainable, stylish, and secure
-                            aluminium glazing solutions, specialising in premium bifold doors and
-                            windows.
-                        </p>
-
-                        <ul className="space-y-4">
+                        {/* Highlights Grid */}
+                        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-10 mb-10">
                             {highlights.map((item, index) => (
-                                <li
-                                    key={index}
-                                    className="flex items-start gap-3 group"
-                                >
-                                    <div className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center group-hover:bg-orange-500 transition-colors duration-200">
-                                        <CircleCheckBig className="h-4 w-4 text-orange-500 group-hover:text-white transition-colors duration-200" />
+                                <Reveal key={index} delay={300 + index * 100} width="100%">
+                                    <div className="group">
+                                        <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">
+                                            <CircleCheckBig className="w-5 h-5 text-orange-500" />
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-slate-600 text-sm leading-relaxed pl-7 border-l-2 border-slate-200 group-hover:border-orange-200 transition-colors">
+                                            {item.description}
+                                        </p>
                                     </div>
-                                    <span className="text-slate-700 font-medium">{item}</span>
-                                </li>
+                                </Reveal>
                             ))}
-                        </ul>
+                        </div>
+
+                        {/* Stats Row */}
+                        <div className="flex flex-wrap gap-8 pt-8 border-t border-slate-200">
+                            {stats.map((stat, index) => (
+                                <Reveal key={index} delay={500 + index * 100}>
+                                    <div>
+                                        <div className="text-3xl lg:text-4xl font-bold text-slate-900 mb-1">{stat.value}</div>
+                                        <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{stat.label}</div>
+                                    </div>
+                                </Reveal>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
