@@ -42,27 +42,31 @@ const features = [
 
 export default function Features() {
     return (
-        <section className="py-20 bg-white">
+        <section className="py-24 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        Why Choose Ultra Windows?
+                    <span className="text-orange-500 font-semibold tracking-wider uppercase text-sm mb-2 block">
+                        Why Choose Ultra Windows
+                    </span>
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-slate-900 mb-6">
+                        Excellence in Every Detail
                     </h2>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                        We&apos;re committed to delivering exceptional quality and service on every project
+                    <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                        We&apos;re committed to delivering exceptional quality and service on every project,
+                        from manufacturing to installation.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                     {features.map((feature) => (
                         <div
                             key={feature.title}
-                            className="bg-white rounded-2xl p-8 text-center border border-slate-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 group"
+                            className="bg-white rounded-2xl p-8 text-center border border-slate-100 hover:border-orange-500/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group"
                         >
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-orange-50 text-orange-500 mb-6 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-50 text-orange-500 mb-6 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-orange-500/25 group-hover:scale-110">
                                 <feature.icon className="h-8 w-8" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">
+                            <h3 className="text-xl font-heading font-bold text-slate-900 mb-3">
                                 {feature.title}
                             </h3>
                             <p className="text-slate-600 leading-relaxed">

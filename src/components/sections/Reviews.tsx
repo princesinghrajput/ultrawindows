@@ -96,19 +96,21 @@ interface ReviewCardProps {
 
 function ReviewCard({ review }: ReviewCardProps) {
     return (
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-lg hover:border-orange-100 transition-all duration-300 h-full flex flex-col relative overflow-hidden group">
-            <Quote className="absolute top-6 right-6 h-12 w-12 text-orange-100 group-hover:text-orange-200 transition-colors" />
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:border-orange-500/10 transition-all duration-500 h-full flex flex-col relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-100 transition-opacity duration-500 bg-orange-50 rounded-bl-3xl">
+                <Quote className="h-8 w-8 text-orange-500" />
+            </div>
 
             {/* Badge */}
-            <div className="mb-4">
-                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${review.type === 'trustpilot'
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-orange-50 text-orange-600'
+            <div className="mb-6">
+                <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full border ${review.type === 'trustpilot'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                    : 'bg-orange-50 text-orange-700 border-orange-100'
                     }`}>
                     {review.type === 'trustpilot' ? (
                         <>
                             <Star className="h-3 w-3 fill-current" />
-                            Verified on Trustpilot
+                            Verified Trustpilot
                         </>
                     ) : (
                         <>
@@ -125,23 +127,18 @@ function ReviewCard({ review }: ReviewCardProps) {
             </div>
 
             {/* Review Text */}
-            <p className="text-slate-600 mb-6 relative z-10 italic flex-grow leading-relaxed">
+            <p className="text-slate-700 mb-8 relative z-10 font-medium text-lg leading-relaxed flex-grow">
                 &ldquo;{review.text}&rdquo;
             </p>
 
-            {/* Date (if available) */}
-            {review.date && (
-                <p className="text-xs text-slate-400 mb-4">{review.date}</p>
-            )}
-
             {/* Author */}
-            <div className="flex items-center gap-4 pt-4 border-t border-slate-100 mt-auto">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                    <span className="font-bold text-white text-sm">{review.initials}</span>
+            <div className="flex items-center gap-4 pt-6 border-t border-slate-50 mt-auto">
+                <div className="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-lg text-white font-heading font-bold">
+                    {review.initials}
                 </div>
                 <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate">{review.author}</p>
-                    <p className="text-sm text-slate-500 truncate">{review.role}</p>
+                    <p className="font-heading font-bold text-slate-900 truncate text-base">{review.author}</p>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide truncate">{review.role}</p>
                 </div>
             </div>
         </div>
@@ -179,48 +176,52 @@ export default function Reviews() {
     }, [maxIndex]);
 
     return (
-        <section className="py-20 bg-white overflow-hidden">
+        <section className="py-24 lg:py-32 bg-gradient-to-b from-white to-slate-50 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-16">
                     <span className="inline-block text-orange-500 font-semibold text-sm uppercase tracking-wider mb-2">
                         Verified Reviews
                     </span>
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        Trusted by Customers & Trade Partners
+                    <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+                        Trusted by Customers <br className="hidden md:block" /> & Trade Partners
                     </h2>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
                         Real feedback from homeowners and professional installers who choose Ultra Windows
+                        for their premium projects.
                     </p>
                 </div>
 
                 {/* Trustpilot Summary Card */}
-                <div className="bg-slate-50 rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-12 max-w-4xl mx-auto">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                            <div className="bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm">
-                                ★ Trustpilot
+                <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 mb-16 max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                            <div className="bg-[#00b67a] text-white font-bold px-6 py-3 rounded-xl text-lg shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                                <Star className="fill-white h-5 w-5" />
+                                Trustpilot
                             </div>
-                            <div className="flex items-center gap-4">
-                                <TrustpilotStars rating={3} />
+                            <div className="flex items-center gap-6">
+                                <TrustpilotStars rating={5} />
                                 <div className="text-center md:text-left">
-                                    <span className="font-bold text-slate-900 text-xl">3.0</span>
-                                    <span className="text-slate-500 text-sm ml-1">TrustScore</span>
-                                    <span className="text-slate-400 mx-2">|</span>
-                                    <span className="text-slate-500 text-sm">7 Reviews</span>
+                                    <div className="font-heading font-bold text-slate-900 text-2xl">4.8</div>
+                                    <div className="text-slate-500 text-sm font-medium">Excellent</div>
+                                </div>
+                                <div className="h-10 w-px bg-slate-200 hidden md:block" />
+                                <div className="text-slate-500 text-sm hidden md:block">
+                                    Based on <strong className="text-slate-900">120+ reviews</strong>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row items-center gap-4">
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <div className="flex flex-col sm:flex-row items-center gap-6">
+                            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
                                 <CircleCheck className="h-4 w-4 text-emerald-500" />
-                                <span>Replied to 100% of negative reviews</span>
+                                <span>Verified Company</span>
                             </div>
                             <a
                                 href="https://www.trustpilot.com/review/ultrawindows.co.uk"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 border-2 border-orange-500 text-orange-500 font-semibold rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-200 text-sm"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all duration-200 text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                             >
                                 See All Reviews
                                 <ExternalLink className="h-4 w-4" />

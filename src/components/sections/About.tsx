@@ -12,11 +12,11 @@ const highlights = [
 
 export default function About() {
     return (
-        <section id="about" className="py-20 bg-slate-50">
+        <section id="about" className="py-20 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     {/* Image */}
-                    <div className="relative">
+                    <div className="relative order-2 lg:order-1">
                         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
                             <Image
                                 src="https://www.ultrawindows.co.uk/assets/bifold-doors-Xyy3pzwa.jpg"
@@ -25,20 +25,25 @@ export default function About() {
                                 className="object-cover"
                                 sizes="(max-width: 1024px) 100vw, 50vw"
                             />
+                            {/* Decorative gradient overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/20 to-transparent" />
                         </div>
                         {/* Experience Badge */}
-                        <div className="absolute -bottom-6 -right-6 bg-orange-500 text-white p-6 rounded-2xl shadow-xl hidden md:block">
-                            <div className="text-4xl font-bold">10+</div>
-                            <div className="text-sm font-medium">Years Experience</div>
+                        <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-2xl shadow-xl hidden md:block transform hover:scale-105 transition-transform duration-300">
+                            <div className="text-4xl font-heading font-bold">10+</div>
+                            <div className="text-sm font-medium opacity-90">Years Experience</div>
                         </div>
+                        {/* Decorative elements */}
+                        <div className="absolute -top-4 -left-4 w-24 h-24 bg-orange-100 rounded-2xl -z-10 hidden lg:block" />
+                        <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-slate-100 rounded-2xl -z-10 hidden lg:block" />
                     </div>
 
                     {/* Content */}
-                    <div>
+                    <div className="order-1 lg:order-2">
                         <span className="inline-block text-orange-500 font-semibold text-sm uppercase tracking-wider mb-3">
                             What We Do
                         </span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
                             Crafting Premium{' '}
                             <span className="text-orange-500">Aluminium Products</span>
                         </h2>
@@ -62,14 +67,16 @@ export default function About() {
                             windows.
                         </p>
 
-                        <ul className="space-y-3">
+                        <ul className="space-y-4">
                             {highlights.map((item, index) => (
                                 <li
                                     key={index}
-                                    className="flex items-start gap-3"
+                                    className="flex items-start gap-3 group"
                                 >
-                                    <CircleCheckBig className="h-6 w-6 text-orange-500 flex-shrink-0 mt-0.5" />
-                                    <span className="text-slate-700">{item}</span>
+                                    <div className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center group-hover:bg-orange-500 transition-colors duration-200">
+                                        <CircleCheckBig className="h-4 w-4 text-orange-500 group-hover:text-white transition-colors duration-200" />
+                                    </div>
+                                    <span className="text-slate-700 font-medium">{item}</span>
                                 </li>
                             ))}
                         </ul>

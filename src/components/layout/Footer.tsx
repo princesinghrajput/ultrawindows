@@ -57,55 +57,57 @@ const socialLinks = [
 
 export default function Footer() {
     return (
-        <footer id="contact" className="bg-slate-900 text-white pt-16 pb-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-                    {/* Company Info */}
-                    <div className="lg:col-span-2">
+        <footer id="contact" className="bg-slate-900 text-white">
+            {/* Main Footer Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 mb-12">
+                    {/* Company Info - Takes 2 columns on large screens */}
+                    <div className="sm:col-span-2 lg:col-span-2">
                         <Image
                             src="https://www.ultrawindows.co.uk/lovable-uploads/2a5b2ca2-19cf-408a-b7a2-9d9e3b9e31c0.png"
                             alt="Ultra Windows"
-                            width={160}
-                            height={64}
-                            className="h-14 w-auto mb-6 object-contain"
+                            width={140}
+                            height={56}
+                            className="h-12 w-auto mb-5 object-contain"
                         />
-                        <p className="text-slate-400 mb-6 max-w-sm leading-relaxed">
+                        <p className="text-slate-400 mb-6 max-w-sm leading-relaxed text-sm">
                             UK manufacturer of premium aluminium doors, windows, and roof products.
                             Quality craftsmanship with a 10-year guarantee.
                         </p>
 
-                        <div className="space-y-4">
+                        {/* Contact Info */}
+                        <div className="space-y-3">
                             <a
                                 href="tel:01707932189"
-                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors group"
                             >
-                                <Phone className="h-5 w-5 text-orange-400" />
-                                <span>01707932189</span>
+                                <Phone className="h-4 w-4 text-orange-400 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm">01707932189</span>
                             </a>
                             <a
                                 href="https://wa.me/447350452948"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors group"
                             >
-                                <span className="text-orange-400"><WhatsAppIcon /></span>
-                                <span>+447350452948</span>
+                                <span className="text-orange-400 group-hover:scale-110 transition-transform"><WhatsAppIcon /></span>
+                                <span className="text-sm">+447350452948</span>
                             </a>
                             <a
                                 href="mailto:sales@ultrawindows.co.uk"
-                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-3 text-slate-400 hover:text-orange-400 transition-colors group"
                             >
-                                <Mail className="h-5 w-5 text-orange-400" />
-                                <span>sales@ultrawindows.co.uk</span>
+                                <Mail className="h-4 w-4 text-orange-400 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm">sales@ultrawindows.co.uk</span>
                             </a>
                             <a
                                 href="https://maps.app.goo.gl/LwdPWABqGCmDXxmy8"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-start gap-3 text-slate-400 hover:text-orange-400 transition-colors"
+                                className="flex items-start gap-3 text-slate-400 hover:text-orange-400 transition-colors group"
                             >
-                                <MapPin className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
-                                <span className="leading-relaxed">
+                                <MapPin className="h-4 w-4 text-orange-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm leading-relaxed">
                                     Ultra Windows & Bifolds<br />
                                     Capital Connect, Bay 3, Travellers Lane,<br />
                                     Welham Green, Hatfield, AL9 7HF
@@ -114,10 +116,10 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Doors */}
+                    {/* Doors Column */}
                     <div>
-                        <h3 className="text-lg font-bold text-white mb-5">Doors</h3>
-                        <ul className="space-y-3">
+                        <h3 className="font-heading text-base font-bold text-white mb-4">Doors</h3>
+                        <ul className="space-y-2.5">
                             {footerLinks.doors.map((link) => (
                                 <li key={link.name}>
                                     <Link href={link.href} className="text-slate-400 hover:text-orange-400 transition-colors text-sm">
@@ -128,10 +130,10 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Windows & Roof */}
+                    {/* Windows & Roof Column */}
                     <div>
-                        <h3 className="text-lg font-bold text-white mb-5">Windows</h3>
-                        <ul className="space-y-3 mb-8">
+                        <h3 className="font-heading text-base font-bold text-white mb-4">Windows</h3>
+                        <ul className="space-y-2.5 mb-6">
                             {footerLinks.windows.map((link) => (
                                 <li key={link.name}>
                                     <Link href={link.href} className="text-slate-400 hover:text-orange-400 transition-colors text-sm">
@@ -141,8 +143,8 @@ export default function Footer() {
                             ))}
                         </ul>
 
-                        <h3 className="text-lg font-bold text-white mb-5">Roof Products</h3>
-                        <ul className="space-y-3">
+                        <h3 className="font-heading text-base font-bold text-white mb-4">Roof Products</h3>
+                        <ul className="space-y-2.5">
                             {footerLinks.roof.map((link) => (
                                 <li key={link.name}>
                                     <Link href={link.href} className="text-slate-400 hover:text-orange-400 transition-colors text-sm">
@@ -153,10 +155,10 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Company */}
+                    {/* Company Column */}
                     <div>
-                        <h3 className="text-lg font-bold text-white mb-5">Company</h3>
-                        <ul className="space-y-3 mb-8">
+                        <h3 className="font-heading text-base font-bold text-white mb-4">Company</h3>
+                        <ul className="space-y-2.5 mb-6">
                             {footerLinks.company.map((link) => (
                                 <li key={link.name}>
                                     <Link href={link.href} className="text-slate-400 hover:text-orange-400 transition-colors text-sm">
@@ -175,18 +177,18 @@ export default function Footer() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={`Follow us on ${social.name}`}
-                                    className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 hover:bg-orange-500 transition-all duration-200"
+                                    className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-800 hover:bg-orange-500 transition-all duration-200 hover:scale-110"
                                 >
-                                    <social.icon className="h-5 w-5" />
+                                    <social.icon className="h-4 w-4" />
                                 </a>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="border-t border-slate-800 pt-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+                {/* Bottom Bar - Copyright & Legal */}
+                <div className="border-t border-slate-800 pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500">
                         <p>© 2026 Ultra Windows & Bifolds Ltd. All rights reserved.</p>
                         <div className="flex gap-6">
                             <Link href="/privacy-policy" className="hover:text-orange-400 transition-colors">
@@ -200,14 +202,16 @@ export default function Footer() {
                 </div>
 
                 {/* Group Companies */}
-                <div className="border-t border-slate-800 mt-8 pt-8 text-center">
-                    <p className="text-sm text-slate-500 mb-4">Part of Ultra Group of Companies</p>
-                    <div className="flex justify-center items-center gap-6 flex-wrap">
+                <div className="border-t border-slate-800 mt-6 pt-6 text-center">
+                    <p className="text-sm text-slate-500 mb-4">
+                        Part of <span className="text-orange-400">Ultra Group</span> of Companies
+                    </p>
+                    <div className="flex justify-center items-center gap-4 flex-wrap">
                         <a
                             href="https://www.ultratough.co.uk/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-5 py-2.5 bg-slate-800 rounded-lg hover:bg-orange-500 transition-all duration-200 text-white font-medium text-sm"
+                            className="px-5 py-2 bg-slate-800 rounded-lg hover:bg-orange-500 transition-all duration-200 text-white font-medium text-sm hover:scale-105"
                         >
                             Ultra Tough
                         </a>
@@ -215,7 +219,7 @@ export default function Footer() {
                             href="https://www.advancedsealedunits.com/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-5 py-2.5 bg-slate-800 rounded-lg hover:bg-orange-500 transition-all duration-200 text-white font-medium text-sm"
+                            className="px-5 py-2 bg-slate-800 rounded-lg hover:bg-orange-500 transition-all duration-200 text-white font-medium text-sm hover:scale-105"
                         >
                             Advanced Sealed Units
                         </a>
