@@ -48,6 +48,15 @@ h6,
       rgba(15, 23, 42, 0.3) 100%);
 }
 
+/* Mobile hero gradient - stronger for better text readability */
+.hero-gradient-mobile {
+  background: linear-gradient(180deg,
+      rgba(15, 23, 42, 0.85) 0%,
+      rgba(15, 23, 42, 0.7) 30%,
+      rgba(15, 23, 42, 0.5) 60%,
+      rgba(15, 23, 42, 0.4) 100%);
+}
+
 /* ========================================
    SECTION STYLING
    ======================================== */
@@ -118,6 +127,25 @@ h6,
   backdrop-filter: blur(8px);
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Mobile trust badge - centered and full width */
+.trust-badge-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.trust-badge-mobile:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .trust-badge-icon {
