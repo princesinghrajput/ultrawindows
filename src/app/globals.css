@@ -192,3 +192,56 @@ h6,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ========================================
+   PORTAL STYLES
+   ======================================== */
+.portal-gradient {
+  background: linear-gradient(135deg,
+      #0f172a 0%,
+      #1e293b 50%,
+      #0f172a 100%);
+}
+
+/* Spinner animation for pending state */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out forwards;
+}
+
+/* Bounce once animation for approval checkmark */
+@keyframes bounce-once {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.5s ease-in-out;
+}
