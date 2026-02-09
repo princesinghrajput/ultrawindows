@@ -15,17 +15,15 @@ import {
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
 import clsx from "clsx";
 
 const navItems = [
-    { href: "/portal/dashboard", label: "Home", icon: LayoutDashboard },
-    { href: "/portal/quotes", label: "Quotes", icon: FileText },
-    { href: "/portal/pending-orders", label: "Pending Orders", icon: Clock },
-    { href: "/portal/orders", label: "Orders", icon: Package },
+    { href: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/portal/quotes", label: "Quotes", icon: FileText, badge: 3 },
+    { href: "/portal/pending-orders", label: "Pending Orders", icon: Clock, badge: 8 },
+    { href: "/portal/orders", label: "All Orders", icon: Package },
     { href: "/portal/customers", label: "Customers", icon: Users },
-    { href: "/portal/users", label: "Users", icon: UserCog },
-    { href: "/portal/help", label: "Help", icon: HelpCircle },
+    { href: "/portal/users", label: "Team", icon: UserCog },
 ];
 
 interface SidebarProps {
@@ -39,25 +37,22 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
     return (
         <aside
             className={clsx(
-                "fixed left-0 top-0 h-full bg-white border-r border-slate-200 flex flex-col transition-all duration-300 z-40",
-                collapsed ? "w-20" : "w-64"
+                "fixed left-0 top-0 h-screen bg-slate-900 flex flex-col transition-all duration-200 z-40",
+                collapsed ? "w-[72px]" : "w-60"
             )}
         >
             {/* Logo */}
-            <div className="p-4 border-b border-slate-100">
-                <Link
-                    href="/portal/dashboard"
-                    className="flex items-center gap-3"
-                >
+            <div className="h-16 flex items-center px-4 border-b border-slate-800">
+                <Link href="/portal/dashboard" className="flex items-center gap-3">
                     <Image
                         src="https://www.ultrawindows.co.uk/lovable-uploads/4398d2ed-0fcc-43e9-ae06-9c93ed73deaa.png"
                         alt="Ultra Windows"
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 flex-shrink-0"
+                        width={36}
+                        height={36}
+                        className="w-9 h-9 flex-shrink-0"
                     />
                     {!collapsed && (
-                        <span className="text-lg font-heading font-bold text-slate-900">
+                        <span className="text-base font-semibold text-white truncate">
                             Office Hub
                         </span>
                     )}
@@ -65,72 +60,77 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-                {navItems.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
-                    const Icon = item.icon;
+            <nav className="flex-1 py-4 px-3 overflow-y-auto overflow-x-hidden">
+                <div className="space-y-1">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+                        const Icon = item.icon;
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={clsx(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group",
-                                isActive
-                                    ? "bg-orange-50 text-orange-600"
-                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                            )}
-                        >
-                            <Icon
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
                                 className={clsx(
-                                    "w-5 h-5 flex-shrink-0 transition-colors",
+                                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+                                    collapsed && "justify-center",
                                     isActive
-                                        ? "text-orange-500"
-                                        : "text-slate-400 group-hover:text-slate-600"
+                                        ? "bg-orange-500 text-white"
+                                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                 )}
-                            />
-                            {!collapsed && (
-                                <span className="font-medium text-sm">{item.label}</span>
-                            )}
-                        </Link>
-                    );
-                })}
+                            >
+                                <Icon className="w-5 h-5 flex-shrink-0" />
+                                {!collapsed && (
+                                    <>
+                                        <span className="text-sm font-medium flex-1 truncate">{item.label}</span>
+                                        {item.badge && (
+                                            <span className={clsx(
+                                                "min-w-[20px] h-5 px-1.5 flex items-center justify-center text-xs font-medium rounded",
+                                                isActive ? "bg-white/20" : "bg-orange-500/20 text-orange-400"
+                                            )}>
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                    </>
+                                )}
+                                {collapsed && item.badge && (
+                                    <span className="absolute top-0 right-1 w-2 h-2 bg-orange-500 rounded-full" />
+                                )}
+                            </Link>
+                        );
+                    })}
+                </div>
             </nav>
 
-            {/* Bottom Section */}
-            <div className="p-3 border-t border-slate-100 space-y-1">
-                {/* Collapse Toggle */}
+            {/* Footer */}
+            <div className="p-3 border-t border-slate-800 space-y-1">
                 <button
                     onClick={onToggle}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all"
+                    className={clsx(
+                        "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
+                        collapsed && "justify-center"
+                    )}
                 >
                     {collapsed ? (
-                        <ChevronRight className="w-5 h-5 text-slate-400" />
+                        <ChevronRight className="w-5 h-5" />
                     ) : (
                         <>
-                            <ChevronLeft className="w-5 h-5 text-slate-400" />
-                            <span className="font-medium text-sm">Collapse</span>
+                            <ChevronLeft className="w-5 h-5" />
+                            <span className="text-sm font-medium">Collapse</span>
                         </>
                     )}
                 </button>
 
-                {/* Logout */}
                 <Link
                     href="/portal/login"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all group"
+                    className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors",
+                        collapsed && "justify-center"
+                    )}
                 >
-                    <LogOut className="w-5 h-5 text-slate-400 group-hover:text-red-500" />
-                    {!collapsed && <span className="font-medium text-sm">Logout</span>}
+                    <LogOut className="w-5 h-5" />
+                    {!collapsed && <span className="text-sm font-medium">Sign Out</span>}
                 </Link>
             </div>
-
-            {/* Footer */}
-            {!collapsed && (
-                <div className="p-4 text-center border-t border-slate-100">
-                    <p className="text-xs text-slate-400">Powered by</p>
-                    <p className="text-xs font-medium text-orange-500">Prime Value Software</p>
-                </div>
-            )}
         </aside>
     );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -124,13 +124,43 @@ export default function Header() {
         company: false
     });
     const [scrolled, setScrolled] = useState(false);
+    const scrolledRef = useRef(false);
+    const rafRef = useRef<number | null>(null);
 
     useEffect(() => {
+        // Use hysteresis to prevent flickering at the boundary
+        const SCROLL_DOWN_THRESHOLD = 50; // Hide top bar when scrolling past 50px
+        const SCROLL_UP_THRESHOLD = 10;   // Show top bar when scrolling back above 10px
+
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            if (rafRef.current) return; // Throttle with RAF
+
+            rafRef.current = requestAnimationFrame(() => {
+                const currentScroll = window.scrollY;
+                const isCurrentlyScrolled = scrolledRef.current;
+
+                // Apply hysteresis: different thresholds for scrolling up vs down
+                if (!isCurrentlyScrolled && currentScroll > SCROLL_DOWN_THRESHOLD) {
+                    scrolledRef.current = true;
+                    setScrolled(true);
+                } else if (isCurrentlyScrolled && currentScroll < SCROLL_UP_THRESHOLD) {
+                    scrolledRef.current = false;
+                    setScrolled(false);
+                }
+
+                rafRef.current = null;
+            });
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+
+        // Passive listener for better scroll performance
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (rafRef.current) {
+                cancelAnimationFrame(rafRef.current);
+            }
+        };
     }, []);
 
     // Prevent body scroll when mobile menu is open
@@ -151,11 +181,28 @@ export default function Header() {
         setMobileDropdowns(prev => ({ ...prev, [name]: !prev[name] }));
     };
 
+    // Calculate header heights for stable layout
+    const topBarHeight = 36; // h-9 = 36px
+    const navHeight = 80; // h-20 = 80px on desktop
+
     return (
         <>
-            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100' : 'bg-white border-b border-transparent'}`}>
+            {/* Static spacer - always same height as nav bar only (top bar scrolls away) */}
+            <div
+                className="h-16 md:h-20"
+                aria-hidden="true"
+            />
+
+            {/* Fixed Header - translates up when scrolled to hide top bar */}
+            <header
+                className="fixed left-0 right-0 z-50 w-full will-change-transform"
+                style={{
+                    top: scrolled ? '-36px' : '0px',
+                    transition: 'top 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+            >
                 {/* Top Bar */}
-                <div className={`bg-slate-900 text-white text-[10px] sm:text-xs font-medium transition-all duration-300 overflow-hidden ${scrolled ? 'h-0 opacity-0' : 'h-8 sm:h-9 opacity-100'}`}>
+                <div className="bg-slate-900 text-white text-[10px] sm:text-xs font-medium h-9">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
                         <div className="flex items-center gap-4 sm:gap-6">
                             <a href="tel:01707932189" className="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
@@ -179,78 +226,78 @@ export default function Header() {
                 </div>
 
                 {/* Main Navigation */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 md:h-20">
-                        {/* Logo */}
-                        <Link href="/" className="flex-shrink-0 relative z-50" onClick={() => setMobileMenuOpen(false)}>
-                            <Image
-                                src="https://www.ultrawindows.co.uk/lovable-uploads/4398d2ed-0fcc-43e9-ae06-9c93ed73deaa.png"
-                                alt="Ultra Windows"
-                                width={180}
-                                height={60}
-                                className="h-8 md:h-10 w-auto object-contain"
-                                priority
-                            />
-                        </Link>
-
-                        {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-                            <Link href="/" className="py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors">
-                                Home
+                <div className={`bg-white border-b transition-shadow duration-300 ${scrolled ? 'shadow-lg border-slate-100' : 'border-slate-100'}`}>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-16 md:h-20">
+                            {/* Logo */}
+                            <Link href="/" className="flex-shrink-0 relative z-50" onClick={() => setMobileMenuOpen(false)}>
+                                <Image
+                                    src="https://www.ultrawindows.co.uk/lovable-uploads/4398d2ed-0fcc-43e9-ae06-9c93ed73deaa.png"
+                                    alt="Ultra Windows"
+                                    width={180}
+                                    height={60}
+                                    className="h-8 md:h-10 w-auto object-contain"
+                                    priority
+                                />
                             </Link>
-                            <NavDropdown
-                                title="Doors"
-                                items={navigation.doors}
-                                isOpen={openDropdown === 'doors'}
-                                onToggle={() => toggleDropdown('doors')}
-                            />
-                            <NavDropdown
-                                title="Windows"
-                                items={navigation.windows}
-                                isOpen={openDropdown === 'windows'}
-                                onToggle={() => toggleDropdown('windows')}
-                            />
-                            <Link href="/roof-lights" className="py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors">
-                                Rooflights
-                            </Link>
-                            <NavDropdown
-                                title="Company"
-                                items={navigation.more}
-                                isOpen={openDropdown === 'more'}
-                                onToggle={() => toggleDropdown('more')}
-                            />
-                        </div>
 
-                        {/* CTA Buttons */}
-                        <div className="hidden lg:flex items-center gap-4">
-                            <a
-                                href="https://ultra-hazel.vercel.app/login"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm font-semibold text-slate-600 hover:text-orange-500 transition-colors"
+                            {/* Desktop Navigation */}
+                            <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+                                <Link href="/" className="py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors">
+                                    Home
+                                </Link>
+                                <NavDropdown
+                                    title="Doors"
+                                    items={navigation.doors}
+                                    isOpen={openDropdown === 'doors'}
+                                    onToggle={() => toggleDropdown('doors')}
+                                />
+                                <NavDropdown
+                                    title="Windows"
+                                    items={navigation.windows}
+                                    isOpen={openDropdown === 'windows'}
+                                    onToggle={() => toggleDropdown('windows')}
+                                />
+                                <Link href="/roof-lights" className="py-2 text-slate-700 font-medium hover:text-orange-500 transition-colors">
+                                    Rooflights
+                                </Link>
+                                <NavDropdown
+                                    title="Company"
+                                    items={navigation.more}
+                                    isOpen={openDropdown === 'more'}
+                                    onToggle={() => toggleDropdown('more')}
+                                />
+                            </div>
+
+                            {/* CTA Buttons */}
+                            <div className="hidden lg:flex items-center gap-4">
+                                <Link
+                                    href="/portal"
+                                    className="text-sm font-semibold text-slate-600 hover:text-orange-500 transition-colors"
+                                >
+                                    Trade Login
+                                </Link>
+                                <Link href="/design-quote">
+                                    <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:-translate-y-0.5">
+                                        Get Quote
+                                        <ArrowRight className="h-4 w-4" />
+                                    </button>
+                                </Link>
+                            </div>
+
+                            {/* Mobile Menu Button */}
+                            <button
+                                className="lg:hidden p-2 -mr-2 text-slate-800 relative z-50 focus:outline-none"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                aria-label="Toggle menu"
                             >
-                                Trade Login
-                            </a>
-                            <Link href="/design-quote">
-                                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-all duration-300 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:-translate-y-0.5">
-                                    Get Quote
-                                    <ArrowRight className="h-4 w-4" />
-                                </button>
-                            </Link>
+                                {mobileMenuOpen ? (
+                                    <X className="h-6 w-6" />
+                                ) : (
+                                    <Menu className="h-6 w-6" />
+                                )}
+                            </button>
                         </div>
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="lg:hidden p-2 -mr-2 text-slate-800 relative z-50 focus:outline-none"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {mobileMenuOpen ? (
-                                <X className="h-6 w-6" />
-                            ) : (
-                                <Menu className="h-6 w-6" />
-                            )}
-                        </button>
                     </div>
                 </div>
             </header>
@@ -327,15 +374,14 @@ export default function Header() {
                                         <ArrowRight className="h-5 w-5" />
                                     </button>
                                 </Link>
-                                <a
-                                    href="https://ultra-hazel.vercel.app/login"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <Link
+                                    href="/portal"
+                                    onClick={() => setMobileMenuOpen(false)}
                                     className="flex items-center justify-center gap-2 w-full px-6 py-3.5 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors"
                                 >
                                     <LogIn className="h-5 w-5" />
                                     Trade Login
-                                </a>
+                                </Link>
                             </div>
                         </nav>
                     </div>

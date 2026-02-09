@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import {
     Search,
     Bell,
@@ -13,8 +12,6 @@ import {
     Settings,
     LogOut,
     User,
-    HelpCircle,
-    Command,
 } from "lucide-react";
 import Sidebar from "./Sidebar";
 import clsx from "clsx";
@@ -27,7 +24,6 @@ interface DashboardLayoutProps {
     breadcrumbs?: { label: string; href?: string }[];
 }
 
-// Mock notifications
 const notifications = [
     { id: 1, title: "New quote approved", message: "Q-2024-0042 has been approved", time: "2 min ago", unread: true },
     { id: 2, title: "Order shipped", message: "O-2024-0018 is on its way", time: "1 hour ago", unread: true },
@@ -37,20 +33,17 @@ const notifications = [
 export default function DashboardLayout({
     children,
     title,
-    subtitle,
     actions,
     breadcrumbs,
 }: DashboardLayoutProps) {
     const pathname = usePathname();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [searchFocused, setSearchFocused] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const notificationRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdowns on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
@@ -64,7 +57,6 @@ export default function DashboardLayout({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Auto-generate breadcrumbs from pathname if not provided
     const autoBreadcrumbs = breadcrumbs || pathname?.split("/").filter(Boolean).map((segment, index, arr) => ({
         label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " "),
         href: index < arr.length - 1 ? `/${arr.slice(0, index + 1).join("/")}` : undefined,
@@ -73,7 +65,7 @@ export default function DashboardLayout({
     const unreadCount = notifications.filter(n => n.unread).length;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-orange-50/30">
+        <div className="min-h-screen bg-slate-50">
             {/* Desktop Sidebar */}
             <div className="hidden lg:block">
                 <Sidebar
@@ -82,51 +74,33 @@ export default function DashboardLayout({
                 />
             </div>
 
-            {/* Mobile Sidebar Overlay */}
-            <div
-                className={clsx(
-                    "lg:hidden fixed inset-0 z-50 transition-all duration-300",
-                    mobileMenuOpen ? "visible" : "invisible"
-                )}
-            >
+            {/* Mobile Sidebar */}
+            <div className={clsx("lg:hidden fixed inset-0 z-50", mobileMenuOpen ? "visible" : "invisible")}>
                 <div
-                    className={clsx(
-                        "absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300",
-                        mobileMenuOpen ? "opacity-100" : "opacity-0"
-                    )}
+                    className={clsx("absolute inset-0 bg-black/50", mobileMenuOpen ? "opacity-100" : "opacity-0")}
                     onClick={() => setMobileMenuOpen(false)}
                 />
-                <div
-                    className={clsx(
-                        "relative w-72 h-full transition-transform duration-300 ease-out",
-                        mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-                    )}
-                >
+                <div className={clsx("relative w-60 h-full", mobileMenuOpen ? "translate-x-0" : "-translate-x-full")}>
                     <Sidebar />
                     <button
                         onClick={() => setMobileMenuOpen(false)}
-                        className="absolute top-4 -right-12 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"
+                        className="absolute top-4 -right-10 w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-600"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div
-                className={clsx(
-                    "transition-all duration-300 ease-out",
-                    sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
-                )}
-            >
-                {/* Top Header */}
-                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/80">
-                    <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-                        {/* Left: Mobile Menu + Breadcrumbs */}
-                        <div className="flex items-center gap-4">
+            <div className={clsx("transition-all duration-200", sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-60")}>
+                {/* Header */}
+                <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
+                    <div className="flex items-center justify-between h-14 px-4">
+                        {/* Left */}
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={() => setMobileMenuOpen(true)}
-                                className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all"
+                                className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
                             >
                                 <Menu className="w-5 h-5" />
                             </button>
@@ -135,199 +109,92 @@ export default function DashboardLayout({
                             <nav className="hidden md:flex items-center gap-1 text-sm">
                                 {autoBreadcrumbs.map((crumb, index) => (
                                     <div key={index} className="flex items-center gap-1">
-                                        {index > 0 && (
-                                            <ChevronRight className="w-4 h-4 text-slate-300" />
-                                        )}
+                                        {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300" />}
                                         {crumb.href ? (
-                                            <Link
-                                                href={crumb.href}
-                                                className="text-slate-500 hover:text-slate-900 transition-colors"
-                                            >
+                                            <Link href={crumb.href} className="text-slate-500 hover:text-slate-900">
                                                 {crumb.label}
                                             </Link>
                                         ) : (
-                                            <span className="font-medium text-slate-900">
-                                                {crumb.label}
-                                            </span>
+                                            <span className="font-medium text-slate-900">{crumb.label}</span>
                                         )}
                                     </div>
                                 ))}
                             </nav>
-
-                            {/* Mobile Title */}
-                            {title && (
-                                <h1 className="md:hidden text-lg font-heading font-bold text-slate-900">
-                                    {title}
-                                </h1>
-                            )}
                         </div>
 
-                        {/* Right: Search + Actions */}
+                        {/* Right */}
                         <div className="flex items-center gap-2">
-                            {/* Global Search */}
-                            <div className="hidden sm:flex items-center">
-                                <div
-                                    className={clsx(
-                                        "relative transition-all duration-300",
-                                        searchFocused ? "w-80" : "w-64"
-                                    )}
-                                >
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search quotes, orders, customers..."
-                                        onFocus={() => setSearchFocused(true)}
-                                        onBlur={() => setSearchFocused(false)}
-                                        className="w-full pl-10 pr-12 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 focus:bg-white transition-all"
-                                    />
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-slate-400">
-                                        <Command className="w-3 h-3" />
-                                        <span className="text-xs font-medium">K</span>
-                                    </div>
-                                </div>
+                            {/* Search */}
+                            <div className="hidden sm:flex items-center relative w-64">
+                                <Search className="absolute left-3 w-4 h-4 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search quotes, orders, cust..."
+                                    className="w-full pl-9 pr-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-300"
+                                />
                             </div>
-
-                            {/* Mobile Search Button */}
-                            <button className="sm:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
-                                <Search className="w-5 h-5" />
-                            </button>
 
                             {/* Notifications */}
                             <div ref={notificationRef} className="relative">
                                 <button
                                     onClick={() => setShowNotifications(!showNotifications)}
-                                    className={clsx(
-                                        "relative p-2 rounded-xl transition-all",
-                                        showNotifications
-                                            ? "bg-orange-50 text-orange-600"
-                                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                                    )}
+                                    className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
                                 >
                                     <Bell className="w-5 h-5" />
                                     {unreadCount > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full shadow-lg shadow-orange-500/50">
+                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-orange-500 text-white text-[10px] font-medium rounded-full">
                                             {unreadCount}
                                         </span>
                                     )}
                                 </button>
 
-                                {/* Notifications Dropdown */}
                                 {showNotifications && (
-                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-                                            <h3 className="font-semibold text-slate-900">Notifications</h3>
-                                            <button className="text-xs text-orange-600 hover:text-orange-700 font-medium">
-                                                Mark all read
-                                            </button>
+                                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg border border-slate-200 shadow-lg overflow-hidden">
+                                        <div className="p-3 border-b border-slate-100 flex items-center justify-between">
+                                            <span className="font-medium text-slate-900">Notifications</span>
+                                            <button className="text-xs text-orange-500">Mark all read</button>
                                         </div>
-                                        <div className="max-h-80 overflow-y-auto">
-                                            {notifications.map((notif) => (
-                                                <button
-                                                    key={notif.id}
-                                                    className={clsx(
-                                                        "w-full p-4 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0",
-                                                        notif.unread && "bg-orange-50/50"
-                                                    )}
-                                                >
-                                                    <div className="flex items-start gap-3">
-                                                        {notif.unread && (
-                                                            <span className="w-2 h-2 mt-1.5 bg-orange-500 rounded-full flex-shrink-0" />
-                                                        )}
-                                                        <div className={!notif.unread ? "ml-5" : ""}>
-                                                            <p className="text-sm font-medium text-slate-900">
-                                                                {notif.title}
-                                                            </p>
-                                                            <p className="text-sm text-slate-500 mt-0.5">
-                                                                {notif.message}
-                                                            </p>
-                                                            <p className="text-xs text-slate-400 mt-1">
-                                                                {notif.time}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </button>
+                                        <div className="max-h-64 overflow-y-auto">
+                                            {notifications.map((n) => (
+                                                <div key={n.id} className={clsx("p-3 border-b border-slate-50 last:border-0", n.unread && "bg-orange-50/50")}>
+                                                    <p className="text-sm font-medium text-slate-900">{n.title}</p>
+                                                    <p className="text-sm text-slate-500">{n.message}</p>
+                                                    <p className="text-xs text-slate-400 mt-1">{n.time}</p>
+                                                </div>
                                             ))}
-                                        </div>
-                                        <div className="p-3 border-t border-slate-100 bg-slate-50">
-                                            <Link
-                                                href="/portal/notifications"
-                                                className="block text-center text-sm text-orange-600 hover:text-orange-700 font-medium"
-                                            >
-                                                View all notifications
-                                            </Link>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* User Menu */}
+                            {/* User */}
                             <div ref={userMenuRef} className="relative">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className={clsx(
-                                        "flex items-center gap-3 p-1.5 pr-3 rounded-xl transition-all",
-                                        showUserMenu
-                                            ? "bg-slate-100"
-                                            : "hover:bg-slate-100"
-                                    )}
+                                    className="flex items-center gap-2 p-1.5 hover:bg-slate-100 rounded-lg"
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold text-sm flex items-center justify-center shadow-lg shadow-orange-500/30">
+                                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white text-sm font-medium flex items-center justify-center">
                                         JD
                                     </div>
                                     <div className="hidden lg:block text-left">
-                                        <p className="text-sm font-medium text-slate-900 leading-tight">
-                                            John Doe
-                                        </p>
-                                        <p className="text-xs text-slate-500 leading-tight">
-                                            Admin
-                                        </p>
+                                        <p className="text-sm font-medium text-slate-900">John Doe</p>
+                                        <p className="text-xs text-slate-500">Admin</p>
                                     </div>
                                 </button>
 
-                                {/* User Dropdown */}
                                 {showUserMenu && (
-                                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="p-4 border-b border-slate-100">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold flex items-center justify-center">
-                                                    JD
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-slate-900">John Doe</p>
-                                                    <p className="text-xs text-slate-500">john@company.com</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg border border-slate-200 shadow-lg overflow-hidden">
                                         <div className="p-2">
-                                            <Link
-                                                href="/portal/profile"
-                                                className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                                            >
-                                                <User className="w-4 h-4 text-slate-400" />
-                                                My Profile
+                                            <Link href="/portal/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                                <User className="w-4 h-4" /> Profile
                                             </Link>
-                                            <Link
-                                                href="/portal/settings"
-                                                className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                                            >
-                                                <Settings className="w-4 h-4 text-slate-400" />
-                                                Settings
-                                            </Link>
-                                            <Link
-                                                href="/portal/help"
-                                                className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                                            >
-                                                <HelpCircle className="w-4 h-4 text-slate-400" />
-                                                Help & Support
+                                            <Link href="/portal/settings" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
+                                                <Settings className="w-4 h-4" /> Settings
                                             </Link>
                                         </div>
                                         <div className="p-2 border-t border-slate-100">
-                                            <Link
-                                                href="/portal/login"
-                                                className="flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            >
-                                                <LogOut className="w-4 h-4" />
-                                                Sign Out
+                                            <Link href="/portal/login" className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
+                                                <LogOut className="w-4 h-4" /> Sign Out
                                             </Link>
                                         </div>
                                     </div>
@@ -338,46 +205,17 @@ export default function DashboardLayout({
                 </header>
 
                 {/* Page Header */}
-                {(title || subtitle || actions) && (
-                    <div className="px-4 lg:px-6 py-6 bg-white border-b border-slate-200/50">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div>
-                                {title && (
-                                    <h1 className="text-2xl font-heading font-bold text-slate-900">
-                                        {title}
-                                    </h1>
-                                )}
-                                {subtitle && (
-                                    <p className="text-slate-500 mt-1">{subtitle}</p>
-                                )}
-                            </div>
-                            {actions && (
-                                <div className="flex items-center gap-3">{actions}</div>
-                            )}
+                {(title || actions) && (
+                    <div className="px-4 lg:px-6 py-4 bg-white border-b border-slate-200">
+                        <div className="flex items-center justify-between">
+                            {title && <h1 className="text-xl font-semibold text-slate-900">{title}</h1>}
+                            {actions && <div className="flex items-center gap-2">{actions}</div>}
                         </div>
                     </div>
                 )}
 
-                {/* Page Content */}
+                {/* Content */}
                 <main className="p-4 lg:p-6">{children}</main>
-
-                {/* Footer */}
-                <footer className="px-4 lg:px-6 py-4 border-t border-slate-200/50 bg-white/50">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-                        <p>© 2024 Ultra Windows. All rights reserved.</p>
-                        <div className="flex items-center gap-4">
-                            <Link href="/portal/help" className="hover:text-slate-600 transition-colors">
-                                Help
-                            </Link>
-                            <Link href="/portal/terms" className="hover:text-slate-600 transition-colors">
-                                Terms
-                            </Link>
-                            <Link href="/portal/privacy" className="hover:text-slate-600 transition-colors">
-                                Privacy
-                            </Link>
-                        </div>
-                    </div>
-                </footer>
             </div>
         </div>
     );
