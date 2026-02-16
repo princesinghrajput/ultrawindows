@@ -36,15 +36,46 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
             try {
                 // Determine raw filename first
                 const configStr = validConfig ? configuration : `${panels}+0`;
-                // Try to use the specific View asset if possible, else standard
-                // Note: We'll apply transparency regardless
-                const filename = view === 'inside' ? `i${configStr}.svg` : `${configStr}.svg`;
-                const path = `/images/aluminium_bifolf/doors/${filename}`;
+
+                // Construct path
+                // If view is inside, try 'i' prefix first.
+                // We'll try to fetch. If fail, fall back.
+                let path: string | null = null;
+                let usedInsideAsset = false;
+
+                // 1. Try specific asset (e.g. i3+0.svg or 3+0.svg)
+                const specificFilename = view === 'inside' ? `i${configStr}.svg` : `${configStr}.svg`;
+                const specificPath = `/images/aluminium_bifolf/doors/${specificFilename}`;
+
+                const response1 = await fetch(specificPath);
+                if (response1.ok) {
+                    path = specificPath;
+                    usedInsideAsset = (view === 'inside');
+                } else if (view === 'inside') {
+                    // 2. If inside view specific failed, try standard view
+                    const standardPath = `/images/aluminium_bifolf/doors/${configStr}.svg`;
+                    const response2 = await fetch(standardPath);
+                    if (response2.ok) {
+                        path = standardPath;
+                    }
+                }
+
+                if (!path) {
+                    // If still no path (e.g. 4+0.svg doesn't exist), we stop here and let fallback render.
+                    setSvgContent(null);
+                    return;
+                }
 
                 const response = await fetch(path);
-                if (!response.ok) throw new Error('Failed to load SVG');
-
                 let svgText = await response.text();
+
+                // ... (rest of manipulation logic) ...
+
+                // Mark if we used the inside asset so we don't flip it again
+                if (usedInsideAsset) {
+                    // Inject a marker ID so we interpret it later
+                    svgText = svgText.replace('<svg ', '<svg id="inside-view-marker" ');
+                }
 
                 // --- Dynamic Manipulation ---
 
@@ -115,7 +146,7 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 h-8 bg-black/40 blur-md rounded-[100%] w-full opacity-50"
             />
 
-            {/* 2. The Door Asset (Inline SVG) */}
+            {/* 2. The Door Asset (Inline SVG) or Fallback */}
             <div
                 className="absolute inset-0 pointer-events-none"
             >
@@ -123,11 +154,37 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
                     <div
                         className="w-full h-full [&>svg]:w-full [&>svg]:h-full drop-shadow-2xl"
                         dangerouslySetInnerHTML={{ __html: svgContent }}
+                        style={{
+                            // Flip if we used a standard asset for inside view to simulate reverse
+                            transform: (view === 'inside' && !svgContent.includes('id="inside-view-marker"')) ? 'scaleX(-1)' : 'none'
+                        }}
                     />
                 ) : (
-                    // Fallback or loading
-                    <div className="w-full h-full flex items-center justify-center text-gray-500 animate-pulse">
-                        Loading Visual...
+                    // PROCEDURAL FALLBACK (for 4/5 panels or missing files)
+                    <div className="w-full h-full flex items-end justify-center">
+                        {/* Frame */}
+                        <div className="w-full h-full border-t-[8px] border-x-[8px] border-b-[8px] border-gray-800 bg-transparent flex shadow-2xl relative">
+                            {/* Panels */}
+                            {Array.from({ length: panels }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="flex-1 h-full border-r-[2px] border-l-[2px] border-gray-700 relative bg-blue-900/10 backdrop-blur-[0.5px] first:border-l-0 last:border-r-0"
+                                >
+                                    {/* Glass Inner Shadow/Highlight */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
+
+                                    {/* Simple Handle (approximate placement) */}
+                                    {/* Place handle on odd panels for simple logic, or based on config if we parsed it properly */}
+                                    <div className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-12 bg-gray-900 rounded-full shadow-sm ${
+                                        // Logic for handle placement:
+                                        // Usually on the meeting stiles. 
+                                        // For now, put on right of odd panels, left of even?
+                                        // Simpler: Just put somewhat realistically.
+                                        (i % 2 === 0) ? 'right-1' : 'left-1'
+                                        } ${view === 'inside' ? 'bg-gray-700' : 'bg-black'}`} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
