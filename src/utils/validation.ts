@@ -1,7 +1,7 @@
 
 import { ProductType, ProductConfig } from '../types/product';
 
-export const MIN_WIDTH = 400;
+export const MIN_WIDTH = 1200;
 export const MAX_WIDTH_BIFOLD = 8000;
 export const MAX_HEIGHT_BIFOLD = 3000;
 
