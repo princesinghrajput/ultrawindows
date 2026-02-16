@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BifoldConfig } from '../../types/product';
+import { BifoldConfig } from '../../../types/product';
 
 interface HardwareSectionProps {
     config: BifoldConfig;

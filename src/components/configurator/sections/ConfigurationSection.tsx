@@ -1,5 +1,5 @@
 import React from 'react';
-import { BifoldConfig } from '../../types/product';
+import { BifoldConfig } from '../../../types/product';
 import MiniBifoldVisualizer from '../visualizers/MiniBifoldVisualizer';
 
 interface ConfigSectionProps {
