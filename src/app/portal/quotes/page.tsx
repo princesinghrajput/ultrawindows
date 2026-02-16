@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, Calendar, MoreHorizontal, FileText } from "lucide-react";
 import DashboardLayout from "@/components/portal/DashboardLayout";
 import DataTable, { Column, StatusBadge } from "@/components/portal/DataTable";
@@ -52,12 +53,14 @@ const columns: Column<Quote>[] = [
 ];
 
 export default function QuotesPage() {
+    const router = useRouter();
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
 
     const handleProductSelect = (product: { id: string; name: string }) => {
-        console.log("Creating quote for:", product);
+        // Navigate to configurator with selected product type
+        router.push(`/configurator?type=${product.id}`);
     };
 
     const filteredQuotes = mockQuotes.filter((quote) => {
