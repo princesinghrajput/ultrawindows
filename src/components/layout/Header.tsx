@@ -187,9 +187,9 @@ export default function Header() {
 
     return (
         <>
-            {/* Static spacer - always same height as nav bar only (top bar scrolls away) */}
+            {/* Static spacer - adjusted to include Top Bar height (36px) + Navbar height */}
             <div
-                className="h-16 md:h-20"
+                className="h-[100px] md:h-[116px]"
                 aria-hidden="true"
             />
 

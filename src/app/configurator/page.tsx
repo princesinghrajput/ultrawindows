@@ -89,7 +89,7 @@ function ConfiguratorContent() {
                 return (
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
                         {/* Visualizer Column (Left - Sticky) */}
-                        <div className="w-full lg:w-2/3 lg:sticky lg:top-24 z-10">
+                        <div className="w-full lg:w-2/3 lg:sticky lg:top-40 z-10">
                             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 {config.type === ProductType.Bifold ? (
                                     <BifoldVisualizer
