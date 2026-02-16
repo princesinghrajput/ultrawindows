@@ -89,21 +89,26 @@ function ConfiguratorContent() {
                 return (
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
                         {/* Visualizer Column (Left - Sticky) */}
-                        <div className="w-full lg:w-2/3 lg:sticky lg:top-40 z-10">
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="w-full lg:w-2/3 lg:sticky lg:top-32 z-0 max-h-[calc(100vh-140px)] flex flex-col">
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 min-h-0 relative">
                                 {config.type === ProductType.Bifold ? (
-                                    <BifoldVisualizer
-                                        width={config.width}
-                                        height={config.height}
-                                        panels={(config as BifoldConfig).panels}
-                                        openingDirection={(config as BifoldConfig).openingDirection}
-                                        configuration={(config as BifoldConfig).configuration}
-                                        color={view === 'outside'
-                                            ? (config as BifoldConfig).outsideColor || config.color
-                                            : (config as BifoldConfig).insideColor || config.color
-                                        }
-                                        view={view}
-                                    />
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-50 p-4">
+                                        <BifoldVisualizer
+                                            width={config.width}
+                                            height={config.height}
+                                            panels={(config as BifoldConfig).panels}
+                                            openingDirection={(config as BifoldConfig).openingDirection}
+                                            configuration={(config as BifoldConfig).configuration}
+                                            color={view === 'outside'
+                                                ? (config as BifoldConfig).outsideColor || config.color
+                                                : (config as BifoldConfig).insideColor || config.color
+                                            }
+                                            handleColor={config.handleColor}
+                                            cill={(config as BifoldConfig).cill}
+                                            trickleVents={config.trickleVents}
+                                            view={view}
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="aspect-video flex items-center justify-center text-gray-400 bg-gray-50">
                                         Visualizer for {config.type} coming soon

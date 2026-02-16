@@ -24,7 +24,7 @@ const ConfigurationSection: React.FC<ConfigSectionProps> = ({ config, onChange }
                 left,
                 right,
                 // Check if we have an asset for this specific combo (mostly 3 panels)
-                hasAsset: (panels === 3)
+                hasAsset: false
             });
         }
         return opts;
@@ -48,16 +48,7 @@ const ConfigurationSection: React.FC<ConfigSectionProps> = ({ config, onChange }
                     `}
                     >
                         <div className="relative w-full h-12 mb-2 flex items-center justify-center">
-                            {opt.hasAsset ? (
-                                <img
-                                    src={`/images/aluminium_bifolf/i${opt.id}.svg`}
-                                    alt={opt.label}
-                                    className="w-full h-full object-contain"
-                                />
-                            ) : (
-                                // Fallback to procedural mini-visualizer for 4, 5+ panels
-                                <MiniBifoldVisualizer left={opt.left} right={opt.right} />
-                            )}
+                            <MiniBifoldVisualizer left={opt.left} right={opt.right} />
                         </div>
                         <span className="text-xs font-semibold text-gray-700">{opt.label}</span>
                     </button>

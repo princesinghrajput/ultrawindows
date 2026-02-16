@@ -24,10 +24,10 @@ const HardwareSection: React.FC<HardwareSectionProps> = ({ config, onChange }) =
                 {handles.map((h) => (
                     <button
                         key={h.value}
-                        onClick={() => onChange({ hardwareColor: h.value })}
+                        onClick={() => onChange({ handleColor: h.value })}
                         className={`
                         flex flex-col items-center p-3 rounded-xl border transition-all
-                        ${config.hardwareColor === h.value
+                        ${config.handleColor === h.value
                                 ? 'border-sky-400 bg-sky-50 shadow-sm'
                                 : 'border-gray-200 hover:border-gray-300 bg-white'}
                     `}

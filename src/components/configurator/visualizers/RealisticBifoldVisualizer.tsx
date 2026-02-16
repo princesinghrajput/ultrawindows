@@ -7,6 +7,9 @@ interface BifoldVisualizerProps {
     openingDirection: 'left' | 'right' | 'both';
     configuration?: string; // "3+0", "2+1", etc.
     color: string;
+    handleColor?: string;
+    cill?: string;
+    trickleVents?: boolean;
     view?: 'inside' | 'outside';
 }
 
@@ -17,125 +20,64 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
     openingDirection,
     configuration = `${panels}+0`,
     color,
+    handleColor = 'chrome',
+    cill = 'none',
+    trickleVents = false,
     view = 'outside' // 'outside' | 'inside'
 }) => {
-    // Fixed aspect ratio for the container
-    const containerAspect = 1.6;
-    const scaledWidth = 800;
-    const scaledHeight = scaledWidth / containerAspect;
-
-    // Parse configuration "L+R"
     const [leftCount, rightCount] = configuration ? configuration.split('+').map(Number) : [panels, 0];
-    const validConfig = !isNaN(leftCount) && !isNaN(rightCount) && (leftCount + rightCount === panels);
 
-    // State for the loaded and processed SVG content
-    const [svgContent, setSvgContent] = React.useState<string | null>(null);
-
-    React.useEffect(() => {
-        const fetchSvg = async () => {
-            try {
-                // Determine raw filename first
-                const configStr = validConfig ? configuration : `${panels}+0`;
-
-                // Construct path
-                // If view is inside, try 'i' prefix first.
-                // We'll try to fetch. If fail, fall back.
-                let path: string | null = null;
-                let usedInsideAsset = false;
-
-                // 1. Try specific asset (e.g. i3+0.svg or 3+0.svg)
-                const specificFilename = view === 'inside' ? `i${configStr}.svg` : `${configStr}.svg`;
-                const specificPath = `/images/aluminium_bifolf/doors/${specificFilename}`;
-
-                const response1 = await fetch(specificPath);
-                if (response1.ok) {
-                    path = specificPath;
-                    usedInsideAsset = (view === 'inside');
-                } else if (view === 'inside') {
-                    // 2. If inside view specific failed, try standard view
-                    const standardPath = `/images/aluminium_bifolf/doors/${configStr}.svg`;
-                    const response2 = await fetch(standardPath);
-                    if (response2.ok) {
-                        path = standardPath;
-                    }
-                }
-
-                if (!path) {
-                    // If still no path (e.g. 4+0.svg doesn't exist), we stop here and let fallback render.
-                    setSvgContent(null);
-                    return;
-                }
-
-                const response = await fetch(path);
-                let svgText = await response.text();
-
-                // ... (rest of manipulation logic) ...
-
-                // Mark if we used the inside asset so we don't flip it again
-                if (usedInsideAsset) {
-                    // Inject a marker ID so we interpret it later
-                    svgText = svgText.replace('<svg ', '<svg id="inside-view-marker" ');
-                }
-
-                // --- Dynamic Manipulation ---
-
-                // 1. Fix Glass Transparency
-                // The assets use #4e9cea (approx blue) for glass. We want it transparent taking on a slight tint.
-                // We'll replace the fill color with rgba.
-                svgText = svgText.replace(/fill:#4e9cea/gi, 'fill: rgba(200, 230, 255, 0.15); stroke: rgba(255,255,255,0.4); stroke-width: 0.5px');
-                svgText = svgText.replace(/fill="#4e9cea"/gi, 'fill="rgba(200, 230, 255, 0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"');
-
-                // 2. Dynamic Frame Coloring
-                // Base colors seen in SVG: #565656, #3d3c3e (Dark Greys)
-                // We want to map these to the selected 'color' prop.
-
-                let targetColor = '#3d3c3e'; // Default Anthracite
-                if (color.toLowerCase().includes('white')) targetColor = '#ffffff';
-                if (color.toLowerCase().includes('black')) targetColor = '#1a1a1a';
-                if (color.toLowerCase().includes('cream')) targetColor = '#f5f5dc';
-
-                // If the user wants specific RALs, we'd need a mapper. For now, basic mapping:
-                if (targetColor !== '#3d3c3e') {
-                    // Replace the standard dark grey profiles with target color
-                    svgText = svgText.replace(/fill:#565656/gi, `fill:${targetColor}`);
-                    svgText = svgText.replace(/fill="#565656"/gi, `fill="${targetColor}"`);
-                    svgText = svgText.replace(/fill:#3d3c3e/gi, `fill:${targetColor}`);
-                    svgText = svgText.replace(/fill="#3d3c3e"/gi, `fill="${targetColor}"`);
-                }
-
-                setSvgContent(svgText);
-            } catch (err) {
-                console.error("Error loading SVG asset:", err);
-                setSvgContent(null);
-            }
+    // Helper to get frame styles
+    const getFrameStyles = (colorName: string) => {
+        const c = colorName.toLowerCase();
+        if (c.includes('white')) return {
+            bg: 'bg-white',
+            borderColor: 'border-white', // Main frame color
+            sashBorder: 'border-gray-200' // Inner definition for white
         };
+        if (c.includes('black')) return {
+            bg: 'bg-zinc-900',
+            borderColor: 'border-zinc-900',
+            sashBorder: 'border-zinc-700'
+        };
+        if (c.includes('grey') || c.includes('anthracite') || c.includes('#333')) return {
+            bg: 'bg-slate-700',
+            borderColor: 'border-slate-700',
+            sashBorder: 'border-slate-600'
+        };
+        return {
+            bg: 'bg-slate-700',
+            borderColor: 'border-slate-700',
+            sashBorder: 'border-slate-600'
+        };
+    };
 
-        fetchSvg();
-    }, [configuration, panels, view, color, validConfig]);
+    const getHandleStyle = (c: string) => {
+        const name = c.toLowerCase();
+        if (name.includes('black')) return 'bg-black shadow-black/20';
+        if (name.includes('white')) return 'bg-white border border-gray-300 shadow-black/10';
+        if (name.includes('gold')) return 'bg-yellow-500 linear-gradient(to bottom, #fcd34d, #d97706) shadow-yellow-900/20';
+        return 'bg-gradient-to-b from-slate-100 to-slate-300 border border-slate-300 shadow-black/20'; // Chrome
+    };
 
-
-    // Door dimensions relative to the container
-    // We want the door to fill the width as requested ("very corner")
-    // We use CSS percentages and aspect-ratio to maintain responsiveness
-
-    // Calculate aspect ratio string for CSS
-    const aspectRatio = `${width} / ${height}`;
-
-    // Floor position relative to container height (approximate perspective)
-    // The background image implies a floor at the bottom
-    const bottomOffset = '0px';
+    const { bg: frameBg, borderColor: frameBorderColor, sashBorder } = getFrameStyles(color);
+    const handleClass = getHandleStyle(handleColor);
 
     return (
         <div
-            className="relative w-full bg-gray-100 rounded-lg overflow-hidden shadow-2xl group flex flex-col justify-end"
-            style={{ aspectRatio: `${width} / ${height}` }}
+            className="relative w-full h-full max-h-full mx-auto shadow-2xl group flex flex-col justify-end overflow-hidden rounded-md bg-white"
+            style={{
+                aspectRatio: `${width} / ${height}`,
+                maxHeight: '100%',
+                maxWidth: '100%'
+            }}
         >
             {/* 1. Realistic Background */}
             <div
                 className="absolute inset-0 bg-no-repeat bg-center transition-all duration-500"
                 style={{
                     backgroundImage: 'url(/images/aluminium_bifolf/backgrounds/garden.webp)',
-                    backgroundSize: '100% 100%', // Force fit to container (which is now door aspect ratio)
+                    backgroundSize: 'cover',
                     filter: view === 'inside' ? 'blur(0px)' : 'brightness(1.0) contrast(1.05)',
                     transform: view === 'inside' ? 'scale(1.0)' : 'scale(1)'
                 }}
@@ -143,63 +85,84 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
 
             {/* Floor Shadow */}
             <div
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-8 bg-black/40 blur-md rounded-[100%] w-full opacity-50"
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-12 bg-black/50 blur-xl rounded-[100%] w-[90%] opacity-40"
             />
 
-            {/* 2. The Door Asset (Inline SVG) or Fallback */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-            >
-                {svgContent ? (
-                    <div
-                        className="w-full h-full [&>svg]:w-full [&>svg]:h-full drop-shadow-2xl"
-                        dangerouslySetInnerHTML={{ __html: svgContent }}
-                        style={{
-                            // Flip if we used a standard asset for inside view to simulate reverse
-                            transform: (view === 'inside' && !svgContent.includes('id="inside-view-marker"')) ? 'scaleX(-1)' : 'none'
-                        }}
-                    />
-                ) : (
-                    // PROCEDURAL FALLBACK (for 4/5 panels or missing files)
-                    <div className="w-full h-full flex items-end justify-center">
-                        {/* Frame */}
-                        <div className="w-full h-full border-t-[8px] border-x-[8px] border-b-[8px] border-gray-800 bg-transparent flex shadow-2xl relative">
-                            {/* Panels */}
-                            {Array.from({ length: panels }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="flex-1 h-full border-r-[2px] border-l-[2px] border-gray-700 relative bg-blue-900/10 backdrop-blur-[0.5px] first:border-l-0 last:border-r-0"
-                                >
-                                    {/* Glass Inner Shadow/Highlight */}
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
+            {/* 2. The Door Assembly Container */}
+            {/* Added padding (inset-8) to simulate wall reveal/opening so it doesn't touch edges */}
+            <div className="absolute inset-0 p-4 flex flex-col pointer-events-none">
 
-                                    {/* Simple Handle (approximate placement) */}
-                                    {/* Place handle on odd panels for simple logic, or based on config if we parsed it properly */}
-                                    <div className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-12 bg-gray-900 rounded-full shadow-sm ${
-                                        // Logic for handle placement:
-                                        // Usually on the meeting stiles. 
-                                        // For now, put on right of odd panels, left of even?
-                                        // Simpler: Just put somewhat realistically.
-                                        (i % 2 === 0) ? 'right-1' : 'left-1'
-                                        } ${view === 'inside' ? 'bg-gray-700' : 'bg-black'}`} />
-                                </div>
-                            ))}
-                        </div>
+                {/* Trickle Vents (Top Addon) */}
+                {trickleVents && (
+                    <div className={`w-full h-4 mb-[1px] ${frameBg} relative shadow-sm z-20 flex-shrink-0 mx-auto rounded-t-sm`} style={{ width: '99%' }}>
+                        <div className="absolute inset-x-4 top-1 h-1.5 bg-black/10 rounded-full" />
+                    </div>
+                )}
+
+                {/* Main Outer Frame */}
+                {/* A solid border frame containing the panels */}
+                <div className={`
+                    relative flex-1 w-full 
+                    border-t-[8px] border-x-[8px] border-b-[8px] 
+                    ${frameBorderColor} 
+                    bg-transparent 
+                    flex shadow-2xl overflow-hidden
+                    ${!trickleVents ? 'rounded-t-sm' : ''}
+                    ${cill === 'none' ? 'rounded-b-sm' : ''}
+                `}>
+
+                    {/* Panels Flex Container */}
+                    <div className="flex-1 flex h-full relative">
+                        {Array.from({ length: panels }).map((_, i) => (
+                            <div
+                                key={i}
+                                // Panel Sash: Thinner cleaner borders
+                                className={`
+                                    flex-1 h-full relative 
+                                    border-[3px]
+                                    ${frameBorderColor}
+                                    ${i > 0 ? '-ml-[3px]' : ''} /* Overlap borders to prevent double thickness */
+                                    bg-blue-300/5 backdrop-blur-[1px]
+                                    overflow-hidden
+                                    z-10
+                                `}
+                            >
+                                {/* Glass Reflection / Sheen */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+
+                                {/* Inner Sash Definition (Subtle line helps distinguish sash from frame) */}
+                                <div className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`} />
+
+                                {/* Handle Placement */}
+                                <div className={`
+                                    absolute top-1/2 -translate-y-1/2 w-[6px] h-20 rounded-[2px] z-30 transition-colors duration-300 
+                                    ${handleClass} 
+                                    ${(i % 2 === 0) ? 'right-2' : 'left-2'}
+                                    shadow-sm
+                                `} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Cill (Bottom Addon) */}
+                {cill !== 'none' && (
+                    <div className={`
+                        w-full h-6 mt-[1px] 
+                        ${frameBg} 
+                        relative shadow-md transform-gpu 
+                        flex-shrink-0 z-20
+                        border-t border-white/10
+                    `}>
+                        {/* Cill Nose */}
+                        <div className="absolute bottom-0 w-full h-2 bg-black/10" />
                     </div>
                 )}
             </div>
 
-            {/* 3. Overlays (Arrows) - Positioned on top of the image */}
-            <div
-                className="absolute left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-500 ease-out"
-                style={{
-                    width: '100%',
-                    aspectRatio: aspectRatio,
-                    bottom: bottomOffset,
-                    maxHeight: '100%'
-                }}
-            >
-                <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+            {/* 3. Overlays (Arrows) */}
+            <div className="absolute inset-0 p-4 pointer-events-none z-40">
+                <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
                     <defs>
                         <marker id="arrowhead-right" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                             <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
@@ -212,24 +175,22 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
                         const isLeftStack = index < leftCount;
                         const arrowDirection = isLeftStack ? 'left' : 'right';
                         const pW = width / panels;
-
-                        // Center of panel
                         const pCx = index * pW + pW / 2;
-                        const pCy = height / 2; // Mid-height
+                        const pCy = height / 2;
 
                         return (
                             <g key={index}>
                                 {arrowDirection === 'right' ? (
                                     <line
-                                        x1={pCx - pW / 3} y1={pCy} x2={pCx + pW / 3} y2={pCy}
-                                        stroke="#ef4444" strokeWidth={height * 0.005} markerEnd="url(#arrowhead-right)"
-                                        style={{ filter: 'drop-shadow(0px 1px 2px rgba(255,255,255,0.8))' }}
+                                        x1={pCx - pW / 4} y1={pCy} x2={pCx + pW / 4} y2={pCy}
+                                        stroke="#ef4444" strokeWidth={Math.max(2, height * 0.0015)} markerEnd="url(#arrowhead-right)"
+                                        style={{ filter: 'drop-shadow(0px 1px 2px white)' }}
                                     />
                                 ) : (
                                     <line
-                                        x1={pCx + pW / 3} y1={pCy} x2={pCx - pW / 3} y2={pCy}
-                                        stroke="#ef4444" strokeWidth={height * 0.005} markerEnd="url(#arrowhead-left)"
-                                        style={{ filter: 'drop-shadow(0px 1px 2px rgba(255,255,255,0.8))' }}
+                                        x1={pCx + pW / 4} y1={pCy} x2={pCx - pW / 4} y2={pCy}
+                                        stroke="#ef4444" strokeWidth={Math.max(2, height * 0.0015)} markerEnd="url(#arrowhead-left)"
+                                        style={{ filter: 'drop-shadow(0px 1px 2px white)' }}
                                     />
                                 )}
                             </g>
@@ -238,14 +199,13 @@ const BifoldVisualizer: React.FC<BifoldVisualizerProps> = ({
                 </svg>
             </div>
 
-
             {/* Footer Label */}
-            <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur px-3 py-1 rounded text-xs font-semibold shadow-sm flex gap-2">
+            <div className="absolute bottom-2 right-4 bg-white/95 backdrop-blur px-3 py-1 rounded text-[10px] font-bold shadow-sm flex gap-2 z-50 text-slate-700 border border-slate-200">
                 <span>{width}x{height}mm</span>
-                <span>•</span>
+                <span className="text-slate-300">•</span>
                 <span>{panels} Panels</span>
-                <span>•</span>
-                <span className="uppercase">{view} View</span>
+                <span className="text-slate-300">•</span>
+                <span className="uppercase text-blue-600">{view} View</span>
             </div>
         </div>
     );
