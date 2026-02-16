@@ -13,7 +13,7 @@ import ColourSection from '../../components/configurator/sections/ColourSection'
 import CillSection from '../../components/configurator/sections/CillSection';
 import HardwareSection from '../../components/configurator/sections/HardwareSection';
 
-export default function ConfiguratorPage() {
+function ConfiguratorContent() {
     const searchParams = useSearchParams();
     const [step, setStep] = useState(1);
     const [config, setConfig] = useState<ProductConfig | null>(null);
@@ -273,5 +273,13 @@ export default function ConfiguratorPage() {
         >
             {renderContent()}
         </ConfiguratorLayout>
+    );
+}
+
+export default function ConfiguratorPage() {
+    return (
+        <React.Suspense fallback={<div className="flex h-[50vh] items-center justify-center">Loading configurator...</div>}>
+            <ConfiguratorContent />
+        </React.Suspense>
     );
 }

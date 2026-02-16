@@ -21,7 +21,7 @@ export interface BaseConfig {
     color: string;
     glass: string;
     handleColor: string;
-    cill: 'none' | '85mm' | '150mm' | '190mm';
+    cill: 'none' | '85mm' | '150mm' | '190mm' | '225mm';
     trickleVents: boolean;
 }
 
