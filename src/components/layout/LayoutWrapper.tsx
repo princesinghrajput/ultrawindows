@@ -11,8 +11,9 @@ export default function LayoutWrapper({
 }) {
     const pathname = usePathname();
     const isPortal = pathname?.startsWith("/portal");
+    const isConfigurator = pathname?.startsWith("/configurator");
 
-    if (isPortal) {
+    if (isPortal || isConfigurator) {
         return <>{children}</>;
     }
 

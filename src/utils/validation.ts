@@ -28,11 +28,21 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
             }
             break;
 
-        case ProductType.FrenchDoor:
-        case ProductType.SingleDoor:
-            // Basic door validation
-            if (height > 2500) return { isValid: false, message: 'Door max height is 2500mm' };
+        case ProductType.FrenchDoor: {
+            const fd = config as any; // Cast to access sidelights safely
+            const leftW = fd.sidelights?.left?.enabled ? fd.sidelights.left.width : 0;
+            const rightW = fd.sidelights?.right?.enabled ? fd.sidelights.right.width : 0;
+            const doorWidth = width - leftW - rightW;
+
+            if (doorWidth > 2476) {
+                return { isValid: false, message: `Door width must be less than 2476mm, currently ${doorWidth}mm` };
+            }
+            if (doorWidth < 1000) {
+                return { isValid: false, message: `Door width must be greater than 1000mm, currently ${doorWidth}mm` };
+            }
+            if (height > 3000) return { isValid: false, message: 'Max height is 3000mm' };
             break;
+        }
 
         // Add other product rules here
     }

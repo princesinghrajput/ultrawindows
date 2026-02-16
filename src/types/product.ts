@@ -21,7 +21,7 @@ export interface BaseConfig {
     color: string;
     glass: string;
     handleColor: string;
-    cill: 'none' | '85mm' | '150mm' | '190mm' | '225mm';
+    cill: 'none' | '85mm' | '150mm' | '190mm' | '225mm' | '90mm' | '230mm';
     trickleVents: boolean;
 }
 
@@ -51,12 +51,24 @@ export interface SliderConfig extends BaseConfig {
 
 export interface DoorConfig extends BaseConfig {
     type: ProductType.FrenchDoor | ProductType.SingleDoor;
-    openIn: boolean;
-    masterSash: 'left' | 'right'; // For French
+    openingDirection: 'in' | 'out';
+    masterHandle: 'left' | 'right';
     sidelights: {
-        left: { enabled: boolean; width: number; height: number };
-        right: { enabled: boolean; width: number; height: number };
+        left: { enabled: boolean; width: number; height: number; transom?: boolean };
+        right: { enabled: boolean; width: number; height: number; transom?: boolean };
         top: { enabled: boolean; height: number };
+    };
+    outsideColor: string;
+    insideColor: string;
+    cill: 'none' | '90mm' | '150mm' | '190mm' | '230mm';
+    threshold: 'standard' | 'low' | 'integrated';
+    trickleVents: boolean;
+    transom: boolean;
+    hardwareColor: string;
+    addons: {
+        left: string | null;
+        right: string | null;
+        top: string | null;
     };
 }
 

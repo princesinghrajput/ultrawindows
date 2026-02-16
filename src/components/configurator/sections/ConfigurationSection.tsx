@@ -34,23 +34,22 @@ const ConfigurationSection: React.FC<ConfigSectionProps> = ({ config, onChange }
 
     return (
         <div>
-            <h3 className="text-lg font-bold mb-4 text-center">Configuration</h3>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {options.map((opt) => (
                     <button
                         key={opt.id}
                         onClick={() => onChange({ configuration: opt.id })}
                         className={`
-                        border-2 rounded-xl p-2 flex flex-col items-center justify-between transition-all aspect-square
+                        border-2 rounded-lg p-2 flex flex-col items-center justify-center transition-all
                         ${config.configuration === opt.id
-                                ? 'border-sky-500 bg-sky-50 ring-2 ring-sky-200'
+                                ? 'border-slate-800 bg-slate-50 ring-1 ring-slate-300'
                                 : 'border-gray-100 hover:border-gray-200 bg-white'}
                     `}
                     >
-                        <div className="relative w-full h-12 mb-2 flex items-center justify-center">
+                        <div className="relative w-full h-10 flex items-center justify-center">
                             <MiniBifoldVisualizer left={opt.left} right={opt.right} />
                         </div>
-                        <span className="text-xs font-semibold text-gray-700">{opt.label}</span>
+                        <span className="text-[11px] font-semibold text-gray-600 mt-1">{opt.label}</span>
                     </button>
                 ))}
             </div>
