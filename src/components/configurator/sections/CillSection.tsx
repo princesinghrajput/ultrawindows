@@ -27,8 +27,8 @@ const CillSection: React.FC<CillSectionProps> = ({ config, onChange }) => {
                         className={`
                         flex flex-col items-center p-2 rounded-lg border transition-all h-28 justify-between
                         ${config.cill === c.value
-                                ? 'border-sky-400 bg-sky-50'
-                                : 'border-gray-200 hover:border-gray-300 bg-white'}
+                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                              : "bg-white border-slate-200 hover:border-slate-300"}
                     `}
                     >
                         <div className="flex-1 flex items-center justify-center w-full">
