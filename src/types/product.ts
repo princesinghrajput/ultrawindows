@@ -90,14 +90,25 @@ export interface DoorConfig extends BaseConfig {
   insideColor: string;
   cill: "none" | "90mm" | "150mm" | "190mm" | "230mm";
   threshold: "standard" | "low" | "integrated";
+  thresholdRamp?: "none" | "inside" | "outside" | "both";
   trickleVents: boolean | number;
-  transom: boolean;
+  transomBars: number;
+  astragalBars: number;
   hardwareColor: string;
   addons: {
     left: string | null;
     right: string | null;
     top: string | null;
   };
+  glassType:
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure";
+  glassPattern?: string;
+  glassThickness?: number;
 }
 
 export interface WindowConfig extends BaseConfig {
