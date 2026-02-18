@@ -70,7 +70,20 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       break;
     }
 
-    // Add other product rules here
+    case ProductType.Slider:
+      if (width < 1000) {
+        return { isValid: false, message: "Min width is 1000mm" };
+      }
+      if (width > 10070) {
+        return { isValid: false, message: "Max width is 10070mm" };
+      }
+      if (height < 800) {
+        return { isValid: false, message: "Min height is 800mm" };
+      }
+      if (height > 2768) {
+        return { isValid: false, message: "Max height is 2768mm" };
+      }
+      break;
   }
 
   return { isValid: true };

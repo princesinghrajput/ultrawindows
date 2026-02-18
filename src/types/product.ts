@@ -48,7 +48,7 @@ export interface BifoldConfig extends BaseConfig {
     | "toughened_obscure"
     | "laminated"
     | "clear"
-    | "obscure"; // Keeping old types for safety
+    | "obscure";
   glassPattern?: string;
   integralBlinds: boolean;
   pas24?: boolean;
@@ -65,6 +65,8 @@ export interface SliderConfig extends BaseConfig {
   interlock: "25mm" | "47mm";
   panels: 2 | 3 | 4 | 6;
   slideDirection: "left" | "right" | "center";
+  outsideColor: string;
+  insideColor: string;
 }
 
 export interface DoorConfig extends BaseConfig {

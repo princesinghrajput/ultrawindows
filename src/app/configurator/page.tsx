@@ -9,6 +9,7 @@ import {
   ProductConfig,
   BifoldConfig,
   DoorConfig,
+  SliderConfig,
 } from "../../types/product";
 import BifoldVisualizer from "../../components/configurator/visualizers/RealisticBifoldVisualizer";
 import { validateDimensions } from "../../utils/validation";
@@ -18,6 +19,7 @@ import CillSection from "../../components/configurator/sections/CillSection";
 import HardwareSection from "../../components/configurator/sections/HardwareSection";
 
 import RealisticFrenchDoorVisualizer from "../../components/configurator/visualizers/RealisticFrenchDoorVisualizer";
+import RealisticSliderVisualizer from "../../components/configurator/visualizers/RealisticSliderVisualizer";
 import SidelightModal from "../../components/configurator/sections/SidelightModal";
 import { calculateBifoldPrice } from "../../utils/pricing";
 import PriceSummary from "../../components/configurator/PriceSummary";
@@ -175,8 +177,26 @@ function ConfiguratorContent() {
         hardwareColor: "chrome",
         transomBars: 0,
         astragalBars: 0,
-        glassType: "clear",
-        glassThickness: 28,
+        glassType: "toughened",
+        glassPattern: "Clear",
+        pas24: false,
+        extras: [],
+      } as any);
+    } else if (type === ProductType.Slider) {
+      setConfig({
+        ...baseConfig,
+        type: ProductType.Slider,
+        width: 3000,
+        interlock: "47mm",
+        panels: 2,
+        slideDirection: "left",
+        outsideColor: "black",
+        insideColor: "black",
+        color: "black",
+        hardwareColor: "chrome",
+        glassType: "toughened",
+        glassThickness: undefined,
+        cill: "150mm",
         extras: [],
       } as any);
     } else {
@@ -196,6 +216,23 @@ function ConfiguratorContent() {
       handleProductSelect(ProductType.Bifold);
     } else if (typeParam === "french_door") {
       handleProductSelect(ProductType.FrenchDoor);
+    } else if (typeParam === "patio") {
+      // Ultra Patio 47mm
+      handleProductSelect(ProductType.Slider);
+      // We set specific override after init
+      setTimeout(() => {
+        setConfig((prev) =>
+          prev ? ({ ...prev, interlock: "47mm" } as any) : null,
+        );
+      }, 0);
+    } else if (typeParam === "aluminium-slider") {
+      // Cortizo 25mm
+      handleProductSelect(ProductType.Slider);
+      setTimeout(() => {
+        setConfig((prev) =>
+          prev ? ({ ...prev, interlock: "25mm" } as any) : null,
+        );
+      }, 0);
     } else {
       router.replace("/portal/quotes");
     }
@@ -290,6 +327,15 @@ function ConfiguratorContent() {
                       <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
                         <RealisticFrenchDoorVisualizer
                           config={config as any}
+                          width={config.width}
+                          height={config.height}
+                          view={view}
+                        />
+                      </div>
+                    ) : config.type === ProductType.Slider ? (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
+                        <RealisticSliderVisualizer
+                          config={config as SliderConfig}
                           width={config.width}
                           height={config.height}
                           view={view}
@@ -729,19 +775,87 @@ function ConfiguratorContent() {
                       </div>
                     </SectionCard>
 
-                    {/* Glass Type */}
-                    <SectionCard title="Glass Type">
-                      <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                          <span className="text-sm text-slate-600">
-                            Glazing Type
+                    {/* Glass Options - Copied from Bifold to match French Door requirements */}
+                    <SectionCard title="Glass Options">
+                      <div className="space-y-4">
+                        {/* Additional Glass Options */}
+                        <div className="pb-4 flex flex-col gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={(config as DoorConfig).pas24 || false}
+                              onChange={(e) =>
+                                updateConfig({ pas24: e.target.checked } as any)
+                              }
+                              className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                            />
+                            <span className="text-sm font-medium text-slate-700">
+                              PAS 24 Certified
+                            </span>
+                          </label>
+
+                          <div className="flex flex-col gap-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  (config as DoorConfig).glassThickness !==
+                                  undefined
+                                }
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    updateConfig({
+                                      glassThickness: 28,
+                                    } as any);
+                                  } else {
+                                    updateConfig({
+                                      glassThickness: undefined,
+                                    } as any);
+                                  }
+                                }}
+                                className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                              />
+                              <span className="text-sm font-medium text-slate-700">
+                                Specify Glass Thickness (if not 28mm)
+                              </span>
+                            </label>
+
+                            {(config as DoorConfig).glassThickness !==
+                              undefined && (
+                              <div className="flex items-center gap-2 ml-6">
+                                <span className="text-sm text-slate-600">
+                                  Glass Thickness
+                                </span>
+                                <input
+                                  type="number"
+                                  value={
+                                    (config as DoorConfig).glassThickness || ""
+                                  }
+                                  onChange={(e) =>
+                                    updateConfig({
+                                      glassThickness:
+                                        parseInt(e.target.value) || 0,
+                                    } as any)
+                                  }
+                                  className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                />
+                                <span className="text-sm text-slate-600">
+                                  mm
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <span className="text-sm text-slate-600 font-medium">
+                            Glass Type
                           </span>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          <div className="grid grid-cols-3 gap-2">
                             {[
                               { label: "Unglazed", value: "unglazed" },
                               { label: "Toughened", value: "toughened" },
                               {
-                                label: "Toughened / Obscure",
+                                label: "Toughened Obscure",
                                 value: "toughened_obscure",
                               },
                             ].map((opt) => (
@@ -917,6 +1031,173 @@ function ConfiguratorContent() {
                           placeholder="Any special requirements or notes..."
                           className="w-full h-24 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-none"
                         />
+                      </div>
+                    </SectionCard>
+                  </>
+                )}
+
+                {/* ── SLIDER CONTROLS ── */}
+                {config.type === ProductType.Slider && (
+                  <>
+                    <SectionCard title="Slide Panels">
+                      <div className="flex gap-2">
+                        {[2, 3, 4].map((p) => {
+                          let isValid = false;
+                          const w = config.width;
+                          if (p === 2) isValid = w >= 1000 && w < 6000;
+                          if (p === 3) isValid = w >= 1500 && w < 8000;
+                          if (p === 4) isValid = w >= 2000;
+
+                          return (
+                            <button
+                              key={p}
+                              onClick={() => {
+                                if (isValid) updateConfig({ panels: p } as any);
+                              }}
+                              disabled={!isValid}
+                              className={`flex-1 py-2 text-sm border rounded-lg transition-colors ${
+                                (config as SliderConfig).panels === p
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : isValid
+                                    ? "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    : "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed"
+                              }`}
+                            >
+                              {p} Panes
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </SectionCard>
+                    <SectionCard title="Configuration">
+                      <div className="flex gap-4">
+                        {(() => {
+                          const panels = (config as SliderConfig).panels;
+                          let options: {
+                            label: string;
+                            value: string;
+                            icon: React.ReactNode;
+                          }[] = [];
+
+                          if (panels === 4) {
+                            options = [
+                              {
+                                label: "Middle",
+                                value: "center",
+                                icon: (
+                                  <svg
+                                    viewBox="0 0 100 60"
+                                    className="w-12 h-12 stroke-slate-800 fill-none stroke-2 center"
+                                  >
+                                    <rect
+                                      x="2"
+                                      y="5"
+                                      width="96"
+                                      height="50"
+                                      rx="1"
+                                    />
+                                    <line x1="26" y1="5" x2="26" y2="55" />
+                                    <line x1="50" y1="5" x2="50" y2="55" />
+                                    <line x1="74" y1="5" x2="74" y2="55" />
+                                    {/* Arrows for middle opening */}
+                                    <path d="M40 30h-10m3 3l-3-3 3-3" />
+                                    <path d="M60 30h10m-3 3l3-3-3-3" />
+                                  </svg>
+                                ),
+                              },
+                            ];
+                          } else {
+                            // 2 or 3 panels
+                            options = [
+                              {
+                                label: "Left",
+                                value: "left",
+                                icon: (
+                                  <svg
+                                    viewBox="0 0 100 60"
+                                    className="w-12 h-12 stroke-slate-800 fill-none stroke-2"
+                                  >
+                                    <rect
+                                      x="2"
+                                      y="5"
+                                      width="96"
+                                      height="50"
+                                      rx="1"
+                                    />
+                                    <line x1="50" y1="5" x2="50" y2="55" />
+                                    {/* Arrow Left */}
+                                    <path d="M70 30H30m3 3l-3-3 3-3" />
+                                  </svg>
+                                ),
+                              },
+                              {
+                                label: "Right",
+                                value: "right",
+                                icon: (
+                                  <svg
+                                    viewBox="0 0 100 60"
+                                    className="w-12 h-12 stroke-slate-800 fill-none stroke-2"
+                                  >
+                                    <rect
+                                      x="2"
+                                      y="5"
+                                      width="96"
+                                      height="50"
+                                      rx="1"
+                                    />
+                                    <line x1="50" y1="5" x2="50" y2="55" />
+                                    {/* Arrow Right */}
+                                    <path d="M30 30h40m-3 3l3-3-3-3" />
+                                  </svg>
+                                ),
+                              },
+                              {
+                                label: panels === 3 ? "Both (Right)" : "Both",
+                                value: "both",
+                                icon: (
+                                  <svg
+                                    viewBox="0 0 100 60"
+                                    className="w-12 h-12 stroke-slate-800 fill-none stroke-2"
+                                  >
+                                    <rect
+                                      x="2"
+                                      y="5"
+                                      width="96"
+                                      height="50"
+                                      rx="1"
+                                    />
+                                    <line x1="50" y1="5" x2="50" y2="55" />
+                                    {/* Arrows Both In */}
+                                    <path d="M20 30h20m-3 3l3-3-3-3" />
+                                    <path d="M80 30H60m3 3l-3-3 3-3" />
+                                  </svg>
+                                ),
+                              },
+                            ];
+                          }
+
+                          return options.map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() =>
+                                updateConfig({
+                                  slideDirection: opt.value,
+                                } as any)
+                              }
+                              className={`flex flex-col items-center justify-center p-4 border rounded-lg w-32 h-40 gap-4 transition-all ${
+                                (config as SliderConfig).slideDirection ===
+                                opt.value
+                                  ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-sm"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                            >
+                              {opt.icon}
+                              <span className="text-sm font-medium text-slate-700">
+                                {opt.label}
+                              </span>
+                            </button>
+                          ));
+                        })()}
                       </div>
                     </SectionCard>
                   </>
@@ -1545,7 +1826,7 @@ function ConfiguratorContent() {
             {priceBreakdown && (
               <div className="fixed bottom-0 left-0 right-0 z-40">
                 <div className="bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-                  <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
                     <PriceSummary breakdown={priceBreakdown} />
                   </div>
                 </div>
