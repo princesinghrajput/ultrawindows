@@ -20,7 +20,7 @@ export interface BaseConfig {
   color: string;
   glass: string;
   handleColor: string;
-  cill: "none" | "85mm" | "150mm" | "190mm" | "225mm" | "90mm" | "230mm";
+  cill: "none" | "85mm" | "150mm" | "180mm" | "190mm" | "225mm" | "90mm" | "230mm" | "250mm";
   trickleVents: boolean | number;
   extras: string[];
   notes: string;
@@ -43,12 +43,12 @@ export interface BifoldConfig extends BaseConfig {
   astragalBars: number; // Vertical bars
   hardwareColor: string;
   glassType:
-    | "unglazed"
-    | "toughened"
-    | "toughened_obscure"
-    | "laminated"
-    | "clear"
-    | "obscure";
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure"
+  | "laminated"
+  | "clear"
+  | "obscure"; // Keeping old types for safety
   glassPattern?: string;
   integralBlinds: boolean;
   pas24?: boolean;
@@ -63,22 +63,32 @@ export interface BifoldConfig extends BaseConfig {
 export interface SliderConfig extends BaseConfig {
   type: ProductType.Slider;
   interlock: "25mm" | "47mm";
-  panels: 2 | 3 | 4 | 6;
-  slideDirection: "left" | "right" | "center";
+  panels: number;
+  slideDirection: "left" | "right" | "both";
   outsideColor: string;
   insideColor: string;
+  cill: "none" | "180mm" | "230mm" | "250mm";
+  threshold: "standard" | "low";
+  thresholdRamp?: "none" | "inside" | "outside" | "both";
+  trickleVents: boolean | number;
+  transomBars: number;
+  astragalBars: number;
+  hardwareColor: string;
   glassType:
-    | "unglazed"
-    | "toughened"
-    | "toughened_obscure"
-    | "laminated"
-    | "clear"
-    | "obscure";
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure"
+  | "clear";
   glassPattern?: string;
-  pas24?: boolean;
   glassThickness?: number;
-  blinds?: string;
+  pas24?: boolean;
+  blinds?: "none" | "mechanical";
   blindsColour?: string;
+  addons: {
+    left: string | null;
+    right: string | null;
+    top: string | null;
+  };
 }
 
 export interface DoorConfig extends BaseConfig {
@@ -115,14 +125,15 @@ export interface DoorConfig extends BaseConfig {
     top: string | null;
   };
   glassType:
-    | "unglazed"
-    | "toughened"
-    | "toughened_obscure"
-    | "laminated"
-    | "clear"
-    | "obscure";
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure"
+  | "laminated"
+  | "clear"
+  | "obscure";
   glassPattern?: string;
   glassThickness?: number;
+  pas24?: boolean;
 }
 
 export interface WindowConfig extends BaseConfig {
