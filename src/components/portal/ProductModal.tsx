@@ -8,7 +8,7 @@ import clsx from "clsx";
 const products = [
     { id: "bifold", name: "Aluminium Bifold", image: "/images/bifold.webp", category: "doors" },
     { id: "french_door", name: "Aluminium French Door", image: "/images/french.webp", category: "doors" },
-    { id: "single", name: "Aluminium Single Door", image: "/images/single.webp", category: "doors" },
+    { id: "single_door", name: "Aluminium Single Door", image: "/images/single.webp", category: "doors" },
     { id: "patio", name: "Ultra Patio 47mm Interlock", image: "/images/patio.webp", category: "doors" },
     { id: "cortizo-patio", name: "Cortizo Patio Door", image: "/images/cortizo_patio.webp", category: "doors" },
     { id: "window", name: "Aluminium Window", image: "/images/window.webp", category: "windows" },
