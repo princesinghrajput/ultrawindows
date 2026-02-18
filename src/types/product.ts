@@ -133,6 +133,7 @@ export interface DoorConfig extends BaseConfig {
   | "obscure";
   glassPattern?: string;
   glassThickness?: number;
+  pas24?: boolean;
 }
 
 export interface WindowConfig extends BaseConfig {
