@@ -67,6 +67,18 @@ export interface SliderConfig extends BaseConfig {
   slideDirection: "left" | "right" | "center";
   outsideColor: string;
   insideColor: string;
+  glassType:
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure";
+  glassPattern?: string;
+  pas24?: boolean;
+  glassThickness?: number;
+  blinds?: string;
+  blindsColour?: string;
 }
 
 export interface DoorConfig extends BaseConfig {

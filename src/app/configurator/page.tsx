@@ -218,24 +218,7 @@ function ConfiguratorContent() {
         addons: { left: null, right: null, top: null },
         hardwareColor: "chrome",
       } as any);
-    } else if (type === ProductType.SingleDoor) {
-      setConfig({
-        ...baseConfig,
-        type: ProductType.SingleDoor,
-        width: 900,
-        color: "black",
-        outsideColor: "black",
-        insideColor: "black",
-        openingDirection: "out",
-        masterHandle: "right",
-        sidelights: {
-          left: { enabled: false, width: 0, height: baseConfig.height },
-          right: { enabled: false, width: 0, height: baseConfig.height },
-          top: { enabled: false, height: 0 },
-        },
-        addons: { left: null, right: null, top: null },
-        hardwareColor: "chrome",
-      } as any);
+
     } else {
       setConfig({ ...baseConfig, type } as any);
     }
@@ -1208,6 +1191,550 @@ function ConfiguratorContent() {
                             </button>
                           ));
                         })()}
+                      </div>
+                    </SectionCard>
+
+                    {/* Frame Colour */}
+                    <SectionCard title="Frame Colour">
+                      <ColourSection
+                        config={config as any}
+                        onChange={updateConfig as any}
+                      />
+                    </SectionCard>
+
+                    {/* Cill */}
+                    <SectionCard title="Cill">
+                      <CillSection
+                        config={config as any}
+                        onChange={updateConfig as any}
+                      />
+                    </SectionCard>
+
+                    {/* Threshold */}
+                    <SectionCard title="Threshold">
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={() =>
+                            updateConfig({ threshold: "standard" } as any)
+                          }
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
+                            (config as any).threshold === "standard"
+                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                              : "bg-white border-slate-200 hover:border-slate-300"
+                          }`}
+                        >
+                          <div className="h-12 w-full mb-2 relative">
+                            <img
+                              src="/images/aluminium_bifolf/standard.png"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-slate-700">
+                            Standard
+                          </span>
+                        </button>
+                        <button
+                          onClick={() =>
+                            updateConfig({ threshold: "low" } as any)
+                          }
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
+                            (config as any).threshold === "low"
+                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                              : "bg-white border-slate-200 hover:border-slate-300"
+                          }`}
+                        >
+                          <div className="h-12 w-full mb-2 relative">
+                            <img
+                              src="/images/aluminium_bifolf/low.png"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-slate-700">
+                            Low
+                          </span>
+                        </button>
+                      </div>
+                    </SectionCard>
+
+                    {/* Glass Type */}
+                    <SectionCard title="Glass Type">
+                      <div className="space-y-4">
+                        {/* PAS 24 & Glass Thickness */}
+                        <div className="pb-4 flex flex-col gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={(config as any).pas24 || false}
+                              onChange={(e) =>
+                                updateConfig({ pas24: e.target.checked } as any)
+                              }
+                              className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                            />
+                            <span className="text-sm font-medium text-slate-700">
+                              PAS 24 Certified
+                            </span>
+                          </label>
+
+                          <div className="flex flex-col gap-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  (config as any).glassThickness !== undefined
+                                }
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    updateConfig({
+                                      glassThickness: 28,
+                                    } as any);
+                                  } else {
+                                    updateConfig({
+                                      glassThickness: undefined,
+                                    } as any);
+                                  }
+                                }}
+                                className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                              />
+                              <span className="text-sm font-medium text-slate-700">
+                                Specify Glass Thickness (if not 28mm)
+                              </span>
+                            </label>
+
+                            {(config as any).glassThickness !== undefined && (
+                              <div className="flex items-center gap-2 ml-6">
+                                <span className="text-sm text-slate-600">
+                                  Glass Thickness
+                                </span>
+                                <input
+                                  type="number"
+                                  value={(config as any).glassThickness || ""}
+                                  onChange={(e) =>
+                                    updateConfig({
+                                      glassThickness:
+                                        parseInt(e.target.value) || 0,
+                                    } as any)
+                                  }
+                                  className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                />
+                                <span className="text-sm text-slate-600">
+                                  mm
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Glass Type Options */}
+                        <div className="flex flex-col gap-3">
+                          <span className="text-sm text-slate-600 font-medium">
+                            Glass Type
+                          </span>
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { label: "Unglazed", value: "unglazed" },
+                              { label: "Toughened", value: "toughened" },
+                              {
+                                label: "Toughened Obscure",
+                                value: "toughened_obscure",
+                              },
+                            ].map((opt) => (
+                              <button
+                                key={opt.value}
+                                onClick={() => {
+                                  let defaultPattern = null;
+                                  if (opt.value === "toughened")
+                                    defaultPattern = "Clear";
+                                  if (opt.value === "toughened_obscure")
+                                    defaultPattern = "Satin";
+                                  updateConfig({
+                                    glassType: opt.value as any,
+                                    glassPattern: defaultPattern,
+                                  } as any);
+                                }}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
+                                  (config as any).glassType === opt.value
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Blinds */}
+                        {(config as any).glassType === "toughened" && (
+                          <div className="flex flex-col gap-3 pt-2">
+                            <span className="text-sm text-slate-600 font-medium">
+                              Blinds
+                            </span>
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* No Blinds */}
+                              <button
+                                onClick={() =>
+                                  updateConfig({
+                                    blinds: "none",
+                                    blindsColour: undefined,
+                                  } as any)
+                                }
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
+                                  !(config as any).blinds ||
+                                  (config as any).blinds === "none"
+                                    ? "bg-sky-50 border-sky-300"
+                                    : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
+                              >
+                                <svg
+                                  className="w-10 h-10 text-slate-400 mb-2"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                                <span className="text-sm font-medium text-slate-700">
+                                  No Blinds
+                                </span>
+                              </button>
+
+                              {/* Mechanical Blinds */}
+                              <button
+                                onClick={() =>
+                                  updateConfig({
+                                    blinds: "mechanical",
+                                    blindsColour:
+                                      (config as any).blindsColour || "White",
+                                  } as any)
+                                }
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
+                                  (config as any).blinds === "mechanical"
+                                    ? "bg-sky-50 border-sky-300"
+                                    : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
+                              >
+                                <svg
+                                  className="w-10 h-10 text-slate-500 mb-2"
+                                  fill="none"
+                                  viewBox="0 0 40 40"
+                                >
+                                  <rect
+                                    x="6"
+                                    y="4"
+                                    width="28"
+                                    height="32"
+                                    rx="1"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    fill="none"
+                                  />
+                                  <line
+                                    x1="8"
+                                    y1="10"
+                                    x2="32"
+                                    y2="10"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                  <line
+                                    x1="8"
+                                    y1="14"
+                                    x2="32"
+                                    y2="14"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                  <line
+                                    x1="8"
+                                    y1="18"
+                                    x2="32"
+                                    y2="18"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                  <line
+                                    x1="8"
+                                    y1="22"
+                                    x2="32"
+                                    y2="22"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                  <line
+                                    x1="8"
+                                    y1="26"
+                                    x2="32"
+                                    y2="26"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                  />
+                                </svg>
+                                <span className="text-sm font-medium text-slate-700">
+                                  Mechanical Blinds
+                                </span>
+                              </button>
+                            </div>
+
+                            {/* Blinds Colour */}
+                            {(config as any).blinds === "mechanical" && (
+                              <div className="flex flex-col gap-2 mt-2">
+                                <span className="text-sm text-slate-600 font-medium">
+                                  Blinds Colour
+                                </span>
+                                <div className="grid grid-cols-4 gap-2">
+                                  {[
+                                    "White",
+                                    "Yellow",
+                                    "Agate Grey",
+                                    "Beige",
+                                    "Green",
+                                    "Light Blue",
+                                    "Cream",
+                                    "Light Grey",
+                                    "Metallic Silver",
+                                    "Silver",
+                                    "Slate Grey",
+                                    "Anthracite",
+                                    "Black",
+                                  ].map((colour) => (
+                                    <button
+                                      key={colour}
+                                      onClick={() =>
+                                        updateConfig({
+                                          blindsColour: colour,
+                                        } as any)
+                                      }
+                                      className={`p-2 text-xs border rounded-lg transition-all text-center ${
+                                        (config as any).blindsColour === colour
+                                          ? "bg-sky-50 border-sky-300 text-sky-700 font-medium"
+                                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                      }`}
+                                    >
+                                      {colour}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Toughened Obscure Sub-options */}
+                        {(config as any).glassType === "toughened_obscure" && (
+                          <div className="flex flex-col gap-2">
+                            <span className="text-sm text-slate-600">
+                              Obscure Pattern
+                            </span>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                              {[
+                                "Arctic (L5)",
+                                "Autumn (L3)",
+                                "Contora (L4)",
+                                "Cotswold (L5)",
+                                "Reeded (L2)",
+                                "Stippolyte (L4)",
+                                "Cassini (L5)",
+                                "Chantilly (L2)",
+                                "Charcoal Sticks (L4)",
+                                "Digital (L3)",
+                                "Everglade (L5)",
+                                "Flemish (L1)",
+                                "Florielle (L4)",
+                                "Mayflower (L4)",
+                                "Minster (L2)",
+                                "Oak (L4)",
+                                "Pelerine (L4)",
+                                "Sycamore (L2)",
+                                "Taffeta (L3)",
+                                "Warwick (L1)",
+                                "Satin",
+                              ].map((opt) => (
+                                <button
+                                  key={opt}
+                                  onClick={() =>
+                                    updateConfig({
+                                      glassPattern: opt,
+                                    } as any)
+                                  }
+                                  className={`p-2 text-xs border rounded-lg transition-all ${
+                                    (config as any).glassPattern === opt
+                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </SectionCard>
+
+
+                    {/* Addons */}
+                    <SectionCard title="Addons">
+                      <div className="space-y-3">
+                        {["Left", "Top", "Right"].map((side) => {
+                          const sideKey = side.toLowerCase() as
+                            | "left"
+                            | "top"
+                            | "right";
+                          return (
+                            <div
+                              key={side}
+                              className="flex items-center justify-between"
+                            >
+                              <span className="text-sm text-slate-600">
+                                Addon {side}
+                              </span>
+                              <select
+                                value={
+                                  (config as any).addons?.[sideKey] || "None"
+                                }
+                                onChange={(e) => {
+                                  const val =
+                                    e.target.value === "None"
+                                      ? null
+                                      : e.target.value;
+                                  const currentAddons = (config as any)
+                                    .addons || {
+                                    left: null,
+                                    right: null,
+                                    top: null,
+                                  };
+                                  updateConfig({
+                                    addons: {
+                                      ...currentAddons,
+                                      [sideKey]: val,
+                                    },
+                                  } as any);
+                                }}
+                                className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none w-28"
+                              >
+                                <option value="None">None</option>
+                                <option value="20mm Addon">20mm</option>
+                                <option value="38mm Addon">38mm</option>
+                              </select>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </SectionCard>
+
+                    {/* Trickle Vents */}
+                    <SectionCard title="Trickle Vents">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">
+                          Number of Trickle Vents
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              const current =
+                                typeof (config as any).trickleVents === "number"
+                                  ? ((config as any).trickleVents as number)
+                                  : (config as any).trickleVents
+                                    ? 1
+                                    : 0;
+                              if (current > 0)
+                                updateConfig({
+                                  trickleVents: current - 1,
+                                } as any);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          >
+                            -
+                          </button>
+                          <span className="text-smfont-medium w-4 text-center">
+                            {typeof (config as any).trickleVents === "number"
+                              ? (config as any).trickleVents
+                              : (config as any).trickleVents
+                                ? 1
+                                : 0}
+                          </span>
+                          <button
+                            onClick={() => {
+                              const current =
+                                typeof (config as any).trickleVents === "number"
+                                  ? ((config as any).trickleVents as number)
+                                  : (config as any).trickleVents
+                                    ? 1
+                                    : 0;
+                              updateConfig({
+                                trickleVents: current + 1,
+                              } as any);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Hardware */}
+                    <SectionCard title="Hardware Colour">
+                      <HardwareSection
+                        config={config as any}
+                        onChange={updateConfig as any}
+                      />
+                    </SectionCard>
+
+                    {/* Extras */}
+                    <SectionCard title="Extras">
+                      <div className="space-y-6">
+                        <div>
+                          <div className="space-y-2">
+                            {["Corner Post", "Flat Pack"].map((extra) => (
+                              <label
+                                key={extra}
+                                className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={(config.extras || []).includes(
+                                    extra,
+                                  )}
+                                  onChange={(e) => {
+                                    const currentExtras = config.extras || [];
+                                    const newExtras = e.target.checked
+                                      ? [...currentExtras, extra]
+                                      : currentExtras.filter(
+                                          (ex) => ex !== extra,
+                                        );
+                                    updateConfig({
+                                      extras: newExtras,
+                                    } as any);
+                                  }}
+                                  className="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500"
+                                />
+                                <span className="text-sm text-slate-700">
+                                  {extra}
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Additional Notes
+                          </label>
+                          <textarea
+                            value={config.notes || ""}
+                            onChange={(e) =>
+                              updateConfig({ notes: e.target.value } as any)
+                            }
+                            placeholder="Any special requirements or notes..."
+                            className="w-full h-24 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-none"
+                          />
+                        </div>
                       </div>
                     </SectionCard>
                   </>
