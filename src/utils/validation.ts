@@ -70,6 +70,17 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       break;
     }
 
+        case ProductType.SingleDoor: {
+            if (width > 1200) {
+                return { isValid: false, message: `Single door max width is 1200mm, currently ${width}mm` };
+            }
+            if (width < 600) {
+                return { isValid: false, message: `Single door min width is 600mm, currently ${width}mm` };
+            }
+            if (height > 2500) return { isValid: false, message: 'Max height for single door is 2500mm' };
+            break;
+        }
+
     case ProductType.Slider:
       if (width < 1000) {
         return { isValid: false, message: "Min width is 1000mm" };

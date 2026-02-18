@@ -19,7 +19,7 @@ const products = [
     category: "doors",
   },
   {
-    id: "single",
+    id: "single_door",
     name: "Aluminium Single Door",
     image: "/images/single.webp",
     category: "doors",
