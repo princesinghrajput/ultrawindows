@@ -48,7 +48,7 @@ export interface BifoldConfig extends BaseConfig {
     | "toughened_obscure"
     | "laminated"
     | "clear"
-    | "obscure"; // Keeping old types for safety
+    | "obscure";
   glassPattern?: string;
   integralBlinds: boolean;
   pas24?: boolean;
@@ -65,6 +65,8 @@ export interface SliderConfig extends BaseConfig {
   interlock: "25mm" | "47mm";
   panels: 2 | 3 | 4 | 6;
   slideDirection: "left" | "right" | "center";
+  outsideColor: string;
+  insideColor: string;
 }
 
 export interface DoorConfig extends BaseConfig {
@@ -90,14 +92,25 @@ export interface DoorConfig extends BaseConfig {
   insideColor: string;
   cill: "none" | "90mm" | "150mm" | "190mm" | "230mm";
   threshold: "standard" | "low" | "integrated";
+  thresholdRamp?: "none" | "inside" | "outside" | "both";
   trickleVents: boolean | number;
-  transom: boolean;
+  transomBars: number;
+  astragalBars: number;
   hardwareColor: string;
   addons: {
     left: string | null;
     right: string | null;
     top: string | null;
   };
+  glassType:
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure";
+  glassPattern?: string;
+  glassThickness?: number;
 }
 
 export interface WindowConfig extends BaseConfig {

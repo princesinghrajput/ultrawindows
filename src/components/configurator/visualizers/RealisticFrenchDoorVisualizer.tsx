@@ -65,12 +65,9 @@ const RealisticFrenchDoorVisualizer: React.FC<
   const rightSidelightWidth = config.sidelights.right.enabled
     ? config.sidelights.right.width
     : 0;
-  const doorWidth = totalWidth - leftSidelightWidth - rightSidelightWidth;
-
   // Percentages for flex layout
   const leftPct = (leftSidelightWidth / totalWidth) * 100;
   const rightPct = (rightSidelightWidth / totalWidth) * 100;
-  const doorPct = (doorWidth / totalWidth) * 100;
 
   return (
     <div
@@ -99,160 +96,269 @@ const RealisticFrenchDoorVisualizer: React.FC<
 
       {/* 2. The Door Assembly Container */}
       <div className="absolute inset-0 p-4 flex flex-col pointer-events-none">
-        {/* Trickle Vents (Top Addon) */}
-        {/* Trickle Vents (Top Addon) */}
-        {(typeof config.trickleVents === "number"
-          ? config.trickleVents > 0
-          : config.trickleVents) && (
-          <div
-            className={`w-full h-4 mb-[1px] ${frameBg} relative shadow-sm z-20 flex-shrink-0 mx-auto rounded-t-sm`}
-            style={{ width: "99%" }}
-          >
-            {typeof config.trickleVents === "number" &&
-            config.trickleVents > 0 ? (
-              Array.from({ length: config.trickleVents }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute top-1 h-1.5 bg-black/10 rounded-full"
-                  style={{
-                    left: `${(100 / ((config.trickleVents as number) + 1)) * (i + 1)}%`,
-                    width: `${Math.min(20, 80 / (config.trickleVents as number))}%`,
-                    transform: "translateX(-50%)",
-                  }}
-                />
-              ))
-            ) : (
-              <div className="absolute inset-x-4 top-1 h-1.5 bg-black/10 rounded-full" />
-            )}
-          </div>
-        )}
+        {/* Top Section: Top Addon + Trickle Vents */}
+        <div className="flex flex-col w-full mx-auto" style={{ width: "100%" }}>
+          {/* Top Addon */}
+          {config.addons?.top && (
+            <div
+              className={`w-full ${config.addons.top.includes("38") ? "h-5" : "h-3"} bg-blue-500 border-x border-t border-blue-600 relative z-10`}
+              style={{ width: "100%" }}
+            />
+          )}
 
-        {/* Main Outer Frame */}
-        <div
-          className={`
+          {/* Trickle Vents (Top Addon) */}
+          {(typeof config.trickleVents === "number"
+            ? config.trickleVents > 0
+            : config.trickleVents) && (
+            <div
+              className={`w-full h-4 mb-[1px] ${frameBg} relative shadow-sm z-20 shrink-0 mx-auto ${
+                !config.addons?.top ? "rounded-t-sm" : ""
+              }`}
+              style={{ width: "99%" }}
+            >
+              {typeof config.trickleVents === "number" &&
+              config.trickleVents > 0 ? (
+                Array.from({ length: config.trickleVents }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner"
+                    style={{
+                      left: `${(100 / (config.trickleVents as number)) * (i + 0.5)}%`,
+                      width: `${Math.min(20, 80 / (config.trickleVents as number))}%`,
+                      transform: "translateX(-50%)",
+                    }}
+                  />
+                ))
+              ) : (
+                <div className="absolute inset-x-4 top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner" />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Middle Section: Left Addon + Frame + Right Addon */}
+        <div className="flex-1 flex w-full relative min-h-0">
+          {/* Left Addon */}
+          {config.addons?.left && (
+            <div
+              className={`
+                    ${config.addons.left.includes("38") ? "w-5" : "w-3"} 
+                    h-full bg-blue-500 border-y border-l border-blue-600
+                    relative z-20 shrink-0
+                `}
+            />
+          )}
+
+          {/* Main Outer Frame */}
+          <div
+            className={`
                     relative flex-1 w-full 
-                    border-t-[8px] border-x-[8px] border-b-[8px] 
+                    border-t-8 border-x-8 border-b-8 
                     ${frameBorderColor} 
                     bg-transparent 
                     flex shadow-2xl overflow-hidden
-                    ${!config.trickleVents ? "rounded-t-sm" : ""}
+                    ${!config.trickleVents && !config.addons?.top ? "rounded-t-sm" : ""}
                     ${config.cill === "none" ? "rounded-b-sm" : ""}
                 `}
-        >
-          {/* Threshold Visual (Bottom Line) */}
-          <div
-            className={`absolute bottom-0 left-0 right-0 h-[4px] z-50 ${config.threshold === "low" ? "bg-gray-300" : "bg-transparent"} border-t border-white/20`}
-          />
+          >
+            {/* Threshold Visual (Bottom Line) */}
+            <div
+              className={`absolute bottom-0 left-0 right-0 h-[4px] z-50 ${config.threshold === "low" ? "bg-gray-300" : "bg-transparent"} border-t border-white/20`}
+            />
 
-          {/* Panels Flex Container */}
-          <div className="flex-1 flex h-full relative">
-            {/* Left Sidelight */}
-            {config.sidelights.left.enabled && (
-              <div
-                style={{ width: `${leftPct}%` }}
-                className={`
+            {/* Panels Flex Container (Modified for Top Light) */}
+            <div className="flex-1 flex flex-col h-full relative">
+              {/* Top Sidelight */}
+              {config.sidelights.top?.enabled && (
+                <div
+                  style={{
+                    height: `${(config.sidelights.top.height / height) * 100}%`,
+                  }}
+                  className={`w-full relative border-b-4 ${frameBorderColor} bg-blue-300/5 backdrop-blur-[1px] overflow-hidden z-10 shrink-0`}
+                >
+                  <div className="absolute inset-0 bg-linear-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+                  <div
+                    className={`absolute inset-0 border ${sashBorder} opacity-50 pointer-events-none`}
+                  />
+                </div>
+              )}
+
+              {/* Main Row (Doors + Side Sidelights) */}
+              <div className="flex-1 flex w-full relative h-full">
+                {/* Left Sidelight */}
+                {config.sidelights.left.enabled && (
+                  <div
+                    style={{ width: `${leftPct}%` }}
+                    className={`
                                     h-full relative 
-                                    border-[3px]
+                                    border-r-[3px]
                                     ${frameBorderColor}
                                     bg-blue-300/5 backdrop-blur-[1px]
                                     overflow-hidden z-10
                                 `}
-              >
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
-                <div
-                  className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
-                />
-                {config.sidelights.left.transom && (
-                  <div
-                    className={`absolute top-1/3 w-full h-[8px] ${frameBg}`}
-                  />
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+                    <div
+                      className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
+                    />
+                    {config.sidelights.left.transom && (
+                      <div
+                        className={`absolute top-1/3 w-full h-[8px] ${frameBg}`}
+                      />
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
 
-            {/* Door 1 (Left Panel) */}
-            <div
-              className={`
+                {/* Door 1 (Left Panel) */}
+                <div
+                  className={`
                             flex-1 h-full relative 
-                            border-[3px]
+                            border-r-[1.5px]
                             ${frameBorderColor}
-                            ${config.sidelights.left.enabled ? "-ml-[3px]" : ""}
                             bg-blue-300/5 backdrop-blur-[1px]
                             overflow-hidden z-10
                         `}
-            >
-              {/* Glass Reflection / Sheen */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
-              {/* Inner Sash Definition */}
-              <div
-                className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
-              />
+                >
+                  {/* Glass Reflection / Sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+                  {/* Inner Sash Definition */}
+                  <div
+                    className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
+                  />
 
-              {/* Handle on left door — always near the center (right side of left panel) */}
-              <div
-                className={`
+                  {/* Transom Bars (Horizontal Dividers) */}
+                  {config.transomBars > 0 &&
+                    Array.from({ length: config.transomBars }).map(
+                      (_, barIndex) => (
+                        <div
+                          key={`tbar-l-${barIndex}`}
+                          className={`absolute w-full h-3 ${frameBg} z-20 shadow-sm border-y border-black/10`}
+                          style={{
+                            top: `${(100 / (config.transomBars + 1)) * (barIndex + 1)}%`,
+                            transform: "translateY(-50%)",
+                          }}
+                        />
+                      ),
+                    )}
+                  {/* Astragal Bars (Vertical Dividers) */}
+                  {config.astragalBars > 0 &&
+                    Array.from({ length: config.astragalBars }).map(
+                      (_, barIndex) => (
+                        <div
+                          key={`abar-l-${barIndex}`}
+                          className={`absolute h-full w-3 ${frameBg} z-20 shadow-sm border-x border-black/10`}
+                          style={{
+                            left: `${(100 / (config.astragalBars + 1)) * (barIndex + 1)}%`,
+                            transform: "translateX(-50%)",
+                          }}
+                        />
+                      ),
+                    )}
+
+                  {/* Handle on left door — always near the center (right side of left panel) */}
+                  <div
+                    className={`
                                 absolute top-1/2 -translate-y-1/2 w-[6px] h-24 rounded-[2px] z-30 transition-colors duration-300
                                 ${handleClass}
                                 right-2
                                 shadow-sm
                             `}
-              />
-            </div>
+                  />
+                </div>
 
-            {/* Door 2 (Right Panel) */}
-            <div
-              className={`
+                {/* Door 2 (Right Panel) */}
+                <div
+                  className={`
                             flex-1 h-full relative 
-                            border-[3px]
+                            border-l-[1.5px]
                             ${frameBorderColor}
-                            -ml-[3px]
                             bg-blue-300/5 backdrop-blur-[1px]
                             overflow-hidden z-10
                         `}
-            >
-              {/* Glass Reflection / Sheen */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
-              {/* Inner Sash Definition */}
-              <div
-                className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
-              />
+                >
+                  {/* Glass Reflection / Sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+                  {/* Inner Sash Definition */}
+                  <div
+                    className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
+                  />
 
-              {/* Handle on right door — always near the center (left side of right panel) */}
-              <div
-                className={`
+                  {/* Transom Bars (Horizontal Dividers) */}
+                  {config.transomBars > 0 &&
+                    Array.from({ length: config.transomBars }).map(
+                      (_, barIndex) => (
+                        <div
+                          key={`tbar-r-${barIndex}`}
+                          className={`absolute w-full h-3 ${frameBg} z-20 shadow-sm border-y border-black/10`}
+                          style={{
+                            top: `${(100 / (config.transomBars + 1)) * (barIndex + 1)}%`,
+                            transform: "translateY(-50%)",
+                          }}
+                        />
+                      ),
+                    )}
+                  {/* Astragal Bars (Vertical Dividers) */}
+                  {config.astragalBars > 0 &&
+                    Array.from({ length: config.astragalBars }).map(
+                      (_, barIndex) => (
+                        <div
+                          key={`abar-r-${barIndex}`}
+                          className={`absolute h-full w-3 ${frameBg} z-20 shadow-sm border-x border-black/10`}
+                          style={{
+                            left: `${(100 / (config.astragalBars + 1)) * (barIndex + 1)}%`,
+                            transform: "translateX(-50%)",
+                          }}
+                        />
+                      ),
+                    )}
+
+                  {/* Handle on right door — always near the center (left side of right panel) */}
+                  <div
+                    className={`
                                 absolute top-1/2 -translate-y-1/2 w-[6px] h-24 rounded-[2px] z-30 transition-colors duration-300
                                 ${handleClass}
                                 left-2
                                 shadow-sm
                             `}
-              />
-            </div>
+                  />
+                </div>
 
-            {/* Right Sidelight */}
-            {config.sidelights.right.enabled && (
-              <div
-                style={{ width: `${rightPct}%` }}
-                className={`
+                {/* Right Sidelight */}
+                {config.sidelights.right.enabled && (
+                  <div
+                    style={{ width: `${rightPct}%` }}
+                    className={`
                                     h-full relative 
-                                    border-[3px]
+                                    border-l-[3px]
                                     ${frameBorderColor}
-                                    -ml-[3px]
                                     bg-blue-300/5 backdrop-blur-[1px]
                                     overflow-hidden z-10
                                 `}
-              >
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
-                <div
-                  className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
-                />
-                {config.sidelights.right.transom && (
-                  <div
-                    className={`absolute top-1/3 w-full h-[8px] ${frameBg}`}
-                  />
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent pointer-events-none opacity-60" />
+                    <div
+                      className={`absolute inset-0 border-[1px] ${sashBorder} opacity-50 pointer-events-none`}
+                    />
+                    {config.sidelights.right.transom && (
+                      <div
+                        className={`absolute top-1/3 w-full h-[8px] ${frameBg}`}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
+          {/* Right Addon */}
+          {config.addons?.right && (
+            <div
+              className={`
+                    ${config.addons.right.includes("38") ? "w-5" : "w-3"} 
+                    h-full bg-blue-500 border-y border-r border-blue-600
+                    relative z-20 shrink-0
+                `}
+            />
+          )}
         </div>
 
         {/* Cill (Bottom Addon) */}
@@ -262,7 +368,7 @@ const RealisticFrenchDoorVisualizer: React.FC<
                         w-full h-6 mt-[1px] 
                         ${frameBg} 
                         relative shadow-md transform-gpu 
-                        flex-shrink-0 z-20
+                        shrink-0 z-20
                         border-t border-white/10
                     `}
           >
@@ -317,7 +423,14 @@ const RealisticFrenchDoorVisualizer: React.FC<
 
             const d1Cx = lW + singleDoorW / 2;
             const d2Cx = lW + singleDoorW + singleDoorW / 2;
-            const cy = height / 2;
+
+            // Adjust cy for top sidelight
+            const topH = config.sidelights.top?.enabled
+              ? config.sidelights.top.height
+              : 0;
+            const doorH = height - topH;
+            const cy = topH + doorH / 2;
+
             const arrowLen = singleDoorW / 3;
             const strokeW = Math.max(2, height * 0.002);
 
