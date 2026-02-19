@@ -66,12 +66,12 @@ const products = [
     image: "/images/rooflight_grey.webp",
     category: "rooflights",
   },
-  {
-    id: "lantern",
-    name: "Roof Lantern",
-    image: "/images/lantern.webp",
-    category: "rooflights",
-  },
+  // {
+  //   id: "lantern",
+  //   name: "Roof Lantern",
+  //   image: "/images/lantern.webp",
+  //   category: "rooflights",
+  // },
 ];
 
 const categories = [
