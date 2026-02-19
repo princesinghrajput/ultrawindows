@@ -139,7 +139,30 @@ export interface DoorConfig extends BaseConfig {
 export interface WindowConfig extends BaseConfig {
   type: ProductType.Window;
   style: "casement" | "tilt_turn";
-  layout: string; // ID of a layout pattern (e.g., "fixed-opener-fixed")
+  windowStyle: string; // e.g., "style-1", "style-21" - ID from windowLayouts
+  frameSystem: "standard" | "flush";
+  configuration: string; // Legacy simple string, keeping for compatibility or simple serialization
+  paneConfigurations?: Record<string, string>; // Map of pane ID to type (e.g "0": "opener", "1": "fixed")
+  outsideColor: string;
+  insideColor: string;
+  hardwareColor: string;
+  transomBars: number;
+  astragalBars: number;
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure"
+  | "laminated"
+  | "clear"
+  | "obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  addons: {
+    left: string | null;
+    right: string | null;
+    top: string | null;
+  };
 }
 
 export interface RoofConfig extends BaseConfig {

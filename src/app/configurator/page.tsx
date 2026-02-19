@@ -10,13 +10,16 @@ import {
   BifoldConfig,
   DoorConfig,
   SliderConfig,
+  WindowConfig,
 } from "../../types/product";
 import BifoldVisualizer from "../../components/configurator/visualizers/RealisticBifoldVisualizer";
+import RealisticAluminiumWindowVisualizer from "../../components/configurator/visualizers/RealisticAluminiumWindowVisualizer";
 import { validateDimensions } from "../../utils/validation";
 import ConfigurationSection from "../../components/configurator/sections/ConfigurationSection";
 import ColourSection from "../../components/configurator/sections/ColourSection";
 import CillSection from "../../components/configurator/sections/CillSection";
 import HardwareSection from "../../components/configurator/sections/HardwareSection";
+import WindowStyleSelector from "../../components/configurator/sections/WindowStyleSelector";
 
 import RealisticFrenchDoorVisualizer from "../../components/configurator/visualizers/RealisticFrenchDoorVisualizer";
 import RealisticSingleDoorVisualizer from "../../components/configurator/visualizers/RealisticSingleDoorVisualizer";
@@ -97,11 +100,10 @@ function ToggleGroup({
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`px-5 py-2.5 text-sm font-medium transition-all ${
-            value === opt.value
-              ? "bg-slate-900 text-white"
-              : "bg-white text-slate-600 hover:bg-slate-50"
-          } ${opt.value !== options[0].value ? "border-l border-slate-200" : ""}`}
+          className={`px-5 py-2.5 text-sm font-medium transition-all ${value === opt.value
+            ? "bg-slate-900 text-white"
+            : "bg-white text-slate-600 hover:bg-slate-50"
+            } ${opt.value !== options[0].value ? "border-l border-slate-200" : ""}`}
         >
           {opt.label}
         </button>
@@ -221,6 +223,22 @@ function ConfiguratorContent() {
         addons: { left: null, right: null, top: null },
         hardwareColor: "chrome",
       } as any);
+    } else if (type === ProductType.Window) {
+      setConfig({
+        ...baseConfig,
+        type: ProductType.Window,
+        style: "casement",
+        windowStyle: "style-21", // Default style
+        frameSystem: "standard",
+        configuration: "Fixed-Opener", // Keep for now
+        outsideColor: "black",
+        insideColor: "white",
+        hardwareColor: "chrome",
+        transomBars: 0,
+        astragalBars: 0,
+        glassType: "clear",
+        addons: { left: null, right: null, top: null },
+      } as WindowConfig);
     } else {
       setConfig({ ...baseConfig, type } as any);
     }
@@ -259,6 +277,8 @@ function ConfiguratorContent() {
       }, 0);
     } else if (typeParam === "slider") {
       handleProductSelect(ProductType.Slider);
+    } else if (typeParam === "window") {
+      handleProductSelect(ProductType.Window);
     } else {
       router.replace("/portal/quotes");
     }
@@ -284,23 +304,23 @@ function ConfiguratorContent() {
         const priceBreakdown =
           config.type === ProductType.Bifold
             ? calculateBifoldPrice({
-                panels: (config as BifoldConfig).panels,
-                cill: (config as BifoldConfig).cill || "none",
-                handleColor: config.handleColor || "chrome",
-                trickleVents: config.trickleVents || 0,
-                width: config.width,
-                height: config.height,
-                outsideColor: (config as BifoldConfig).outsideColor,
-                insideColor: (config as BifoldConfig).insideColor,
-                color: config.color,
-                blinds: (config as BifoldConfig).integralBlinds,
-                transomBars: (config as BifoldConfig).transomBars || 0,
-                astragalBars: (config as BifoldConfig).astragalBars || 0,
-                addonLeft: (config as BifoldConfig).addons?.left || undefined,
-                addonRight: (config as BifoldConfig).addons?.right || undefined,
-                addonTop: (config as BifoldConfig).addons?.top || undefined,
-                extras: config.extras,
-              })
+              panels: (config as BifoldConfig).panels,
+              cill: (config as BifoldConfig).cill || "none",
+              handleColor: config.handleColor || "chrome",
+              trickleVents: config.trickleVents || 0,
+              width: config.width,
+              height: config.height,
+              outsideColor: (config as BifoldConfig).outsideColor,
+              insideColor: (config as BifoldConfig).insideColor,
+              color: config.color,
+              blinds: (config as BifoldConfig).integralBlinds,
+              transomBars: (config as BifoldConfig).transomBars || 0,
+              astragalBars: (config as BifoldConfig).astragalBars || 0,
+              addonLeft: (config as BifoldConfig).addons?.left || undefined,
+              addonRight: (config as BifoldConfig).addons?.right || undefined,
+              addonTop: (config as BifoldConfig).addons?.top || undefined,
+              extras: config.extras,
+            })
             : null;
 
         return (
@@ -330,13 +350,13 @@ function ConfiguratorContent() {
                           color={
                             view === "outside"
                               ? (config as BifoldConfig).outsideColor ||
-                                config.color
+                              config.color
                               : (config as BifoldConfig).insideColor ||
-                                config.color
+                              config.color
                           }
                           handleColor={config.handleColor}
                           cill={(config as BifoldConfig).cill}
-                          trickleVents={config.trickleVents}
+                          trickleVents={(config as BifoldConfig).trickleVents as any}
                           view={view}
                           integralBlinds={
                             (config as BifoldConfig).integralBlinds
@@ -371,6 +391,15 @@ function ConfiguratorContent() {
                       <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
                         <RealisticSliderVisualizer
                           config={config as SliderConfig}
+                          width={config.width}
+                          height={config.height}
+                          view={view}
+                        />
+                      </div>
+                    ) : config.type === ProductType.Window ? (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
+                        <RealisticAluminiumWindowVisualizer
+                          config={config as WindowConfig}
                           width={config.width}
                           height={config.height}
                           view={view}
@@ -467,21 +496,21 @@ function ConfiguratorContent() {
                   {/* Sidelights button for French Door & Single Door */}
                   {(config.type === ProductType.FrenchDoor ||
                     config.type === ProductType.SingleDoor) && (
-                    <div className="mt-4">
-                      <button
-                        onClick={() => setIsSidelightModalOpen(true)}
-                        className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg shadow-sm hover:bg-orange-600 transition-colors text-sm font-medium"
-                      >
-                        Edit Sidelights
-                      </button>
-                      <SidelightModal
-                        isOpen={isSidelightModalOpen}
-                        onClose={() => setIsSidelightModalOpen(false)}
-                        config={config as any}
-                        onChange={updateConfig as any}
-                      />
-                    </div>
-                  )}
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setIsSidelightModalOpen(true)}
+                          className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg shadow-sm hover:bg-orange-600 transition-colors text-sm font-medium"
+                        >
+                          Edit Sidelights
+                        </button>
+                        <SidelightModal
+                          isOpen={isSidelightModalOpen}
+                          onClose={() => setIsSidelightModalOpen(false)}
+                          config={config as any}
+                          onChange={updateConfig as any}
+                        />
+                      </div>
+                    )}
 
                   {/* Validation */}
                   {!validation.isValid && (
@@ -492,7 +521,159 @@ function ConfiguratorContent() {
                   )}
                 </SectionCard>
 
-                {/* ── FRENCH DOOR CONTROLS ── */}
+
+                {/* ── WINDOW CONTROLS ── */}
+                {config.type === ProductType.Window && (
+                  <>
+                    {/* Frame System */}
+                    <SectionCard title="Frame System">
+                      <div className="flex bg-slate-100 p-1 rounded-lg">
+                        {["standard", "flush"].map((sys) => (
+                          <button
+                            key={sys}
+                            onClick={() => updateConfig({ frameSystem: sys } as any)}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md capitalize transition-all ${(config as WindowConfig).frameSystem === sys
+                              ? "bg-white text-slate-900 shadow-sm"
+                              : "text-slate-500 hover:text-slate-700"
+                              }`}
+                          >
+                            {sys}
+                          </button>
+                        ))}
+                      </div>
+                    </SectionCard>
+
+                    {/* Style Configuration */}
+                    <SectionCard title="Window Style">
+                      <WindowStyleSelector
+                        value={(config as WindowConfig).windowStyle || "style-21"}
+                        onChange={(styleId) => updateConfig({ windowStyle: styleId } as any)}
+                      />
+                    </SectionCard>
+
+                    {/* Colours */}
+                    <SectionCard title="Frame Colour">
+                      <ColourSection
+                        config={config as any}
+                        onChange={updateConfig as any}
+                      />
+                    </SectionCard>
+
+                    {/* Hardware */}
+                    <SectionCard title="Hardware Colour">
+                      <HardwareSection
+                        config={config as any}
+                        onChange={(updates) => updateConfig({ ...updates } as any)}
+                      />
+                    </SectionCard>
+
+                    {/* Cill */}
+                    <SectionCard title="Cill">
+                      <CillSection
+                        config={config as any}
+                        onChange={updateConfig as any}
+                      />
+                    </SectionCard>
+
+                    {/* Trickle Vents */}
+                    <SectionCard title="Trickle Vents">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">
+                          Number of Trickle Vents
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              const current = typeof (config as WindowConfig).trickleVents === "number"
+                                ? ((config as WindowConfig).trickleVents as number)
+                                : (config as WindowConfig).trickleVents ? 1 : 0;
+                              if (current > 0)
+                                updateConfig({ trickleVents: current - 1 } as any);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          >
+                            -
+                          </button>
+                          <span className="text-sm font-medium w-4 text-center">
+                            {typeof (config as WindowConfig).trickleVents === "number"
+                              ? (config as WindowConfig).trickleVents
+                              : (config as WindowConfig).trickleVents ? 1 : 0}
+                          </span>
+                          <button
+                            onClick={() => {
+                              const current = typeof (config as WindowConfig).trickleVents === "number"
+                                ? ((config as WindowConfig).trickleVents as number)
+                                : (config as WindowConfig).trickleVents ? 1 : 0;
+                              updateConfig({ trickleVents: current + 1 } as any);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Glass Options */}
+                    <SectionCard title="Glass Options">
+                      <div className="space-y-4">
+                        <div className="pb-4 flex flex-col gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={(config as WindowConfig).pas24 || false}
+                              onChange={(e) => updateConfig({ pas24: e.target.checked } as any)}
+                              className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                            />
+                            <span className="text-sm font-medium text-slate-700">PAS 24 Certified</span>
+                          </label>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          {["Clear", "Obscure", "Laminated"].map((type) => (
+                            <button
+                              key={type}
+                              onClick={() => updateConfig({ glassType: type.toLowerCase() as any })}
+                              className={`px-3 py-2 text-sm border rounded-lg transition-all ${(config as WindowConfig).glassType === type.toLowerCase()
+                                ? "bg-slate-900 text-white border-slate-900"
+                                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                }`}
+                            >
+                              {type}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Addons */}
+                    <SectionCard title="Addons">
+                      <div className="space-y-3">
+                        {["Left", "Top", "Right"].map((side) => {
+                          const sideKey = side.toLowerCase() as "left" | "top" | "right";
+                          return (
+                            <div key={side} className="flex items-center justify-between">
+                              <span className="text-sm text-slate-600">Addon {side}</span>
+                              <select
+                                value={(config as WindowConfig).addons?.[sideKey] || "None"}
+                                onChange={(e) => {
+                                  const val = e.target.value === "None" ? null : e.target.value;
+                                  const currentAddons = (config as WindowConfig).addons || { left: null, right: null, top: null };
+                                  updateConfig({ addons: { ...currentAddons, [sideKey]: val } } as any);
+                                }}
+                                className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none w-28"
+                              >
+                                <option value="None">None</option>
+                                <option value="20mm Addon">20mm</option>
+                                <option value="38mm Addon">38mm</option>
+                              </select>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </SectionCard>
+                  </>
+                )}
+
                 {config.type === ProductType.FrenchDoor && (
                   <>
                     {/* Master Handle */}
@@ -553,11 +734,10 @@ function ConfiguratorContent() {
                               thresholdRamp: undefined, // Reset ramp on standard
                             } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "standard"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "standard"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -573,11 +753,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "low" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "low"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "low"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -727,9 +906,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as DoorConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as DoorConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as DoorConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -744,7 +923,7 @@ function ConfiguratorContent() {
                           </button>
                           <span className="text-smfont-medium w-4 text-center">
                             {typeof (config as DoorConfig).trickleVents ===
-                            "number"
+                              "number"
                               ? (config as DoorConfig).trickleVents
                               : (config as DoorConfig).trickleVents
                                 ? 1
@@ -754,9 +933,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as DoorConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as DoorConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as DoorConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -819,28 +998,28 @@ function ConfiguratorContent() {
 
                             {(config as DoorConfig).glassThickness !==
                               undefined && (
-                              <div className="flex items-center gap-2 ml-6">
-                                <span className="text-sm text-slate-600">
-                                  Glass Thickness
-                                </span>
-                                <input
-                                  type="number"
-                                  value={
-                                    (config as DoorConfig).glassThickness || ""
-                                  }
-                                  onChange={(e) =>
-                                    updateConfig({
-                                      glassThickness:
-                                        parseInt(e.target.value) || 0,
-                                    } as any)
-                                  }
-                                  className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
-                                />
-                                <span className="text-sm text-slate-600">
-                                  mm
-                                </span>
-                              </div>
-                            )}
+                                <div className="flex items-center gap-2 ml-6">
+                                  <span className="text-sm text-slate-600">
+                                    Glass Thickness
+                                  </span>
+                                  <input
+                                    type="number"
+                                    value={
+                                      (config as DoorConfig).glassThickness || ""
+                                    }
+                                    onChange={(e) =>
+                                      updateConfig({
+                                        glassThickness:
+                                          parseInt(e.target.value) || 0,
+                                      } as any)
+                                    }
+                                    className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                  />
+                                  <span className="text-sm text-slate-600">
+                                    mm
+                                  </span>
+                                </div>
+                              )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -869,11 +1048,10 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as DoorConfig).glassType === opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as DoorConfig).glassType === opt.value
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -901,11 +1079,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as DoorConfig).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as DoorConfig).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -916,53 +1093,52 @@ function ConfiguratorContent() {
 
                         {(config as DoorConfig).glassType ===
                           "toughened_obscure" && (
-                          <div className="flex flex-col gap-2">
-                            <span className="text-sm text-slate-600">
-                              Obscure Pattern
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                              {[
-                                "Arctic (L5)",
-                                "Autumn (L3)",
-                                "Contora (L4)",
-                                "Cotswold (L5)",
-                                "Reeded (L2)",
-                                "Stippolyte (L4)",
-                                "Cassini (L5)",
-                                "Chantilly (L2)",
-                                "Charcoal Sticks (L4)",
-                                "Digital (L3)",
-                                "Everglade (L5)",
-                                "Flemish (L1)",
-                                "Florielle (L4)",
-                                "Mayflower (L4)",
-                                "Minster (L2)",
-                                "Oak (L4)",
-                                "Pelerine (L4)",
-                                "Sycamore (L2)",
-                                "Taffeta (L3)",
-                                "Warwick (L1)",
-                                "Satin",
-                              ].map((opt) => (
-                                <button
-                                  key={opt}
-                                  onClick={() =>
-                                    updateConfig({
-                                      glassPattern: opt,
-                                    } as any)
-                                  }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as DoorConfig).glassPattern === opt
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600">
+                                Obscure Pattern
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  "Arctic (L5)",
+                                  "Autumn (L3)",
+                                  "Contora (L4)",
+                                  "Cotswold (L5)",
+                                  "Reeded (L2)",
+                                  "Stippolyte (L4)",
+                                  "Cassini (L5)",
+                                  "Chantilly (L2)",
+                                  "Charcoal Sticks (L4)",
+                                  "Digital (L3)",
+                                  "Everglade (L5)",
+                                  "Flemish (L1)",
+                                  "Florielle (L4)",
+                                  "Mayflower (L4)",
+                                  "Minster (L2)",
+                                  "Oak (L4)",
+                                  "Pelerine (L4)",
+                                  "Sycamore (L2)",
+                                  "Taffeta (L3)",
+                                  "Warwick (L1)",
+                                  "Satin",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({
+                                        glassPattern: opt,
+                                      } as any)
+                                    }
+                                    className={`p-2 text-xs border rounded-lg transition-all ${(config as DoorConfig).glassPattern === opt
                                       ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
                                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
-                                >
-                                  {opt}
-                                </button>
-                              ))}
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </SectionCard>
 
@@ -1052,13 +1228,12 @@ function ConfiguratorContent() {
                                 if (isValid) updateConfig({ panels: p } as any);
                               }}
                               disabled={!isValid}
-                              className={`flex-1 py-2 text-sm border rounded-lg transition-colors ${
-                                (config as SliderConfig).panels === p
-                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                  : isValid
-                                    ? "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                    : "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed"
-                              }`}
+                              className={`flex-1 py-2 text-sm border rounded-lg transition-colors ${(config as SliderConfig).panels === p
+                                ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                : isValid
+                                  ? "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  : "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed"
+                                }`}
                             >
                               {p} Panes
                             </button>
@@ -1181,12 +1356,11 @@ function ConfiguratorContent() {
                                   slideDirection: opt.value,
                                 } as any)
                               }
-                              className={`flex flex-col items-center justify-center p-4 border rounded-lg w-32 h-40 gap-4 transition-all ${
-                                (config as SliderConfig).slideDirection ===
+                              className={`flex flex-col items-center justify-center p-4 border rounded-lg w-32 h-40 gap-4 transition-all ${(config as SliderConfig).slideDirection ===
                                 opt.value
-                                  ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-sm"
-                                  : "bg-white border-slate-200 hover:border-slate-300"
-                              }`}
+                                ? "bg-white border-slate-900 ring-1 ring-slate-900 shadow-sm"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
                             >
                               {opt.icon}
                               <span className="text-sm font-medium text-slate-700">
@@ -1221,11 +1395,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "standard" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "standard"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "standard"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -1241,11 +1414,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "low" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "low"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "low"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -1355,11 +1527,10 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as any).glassType === opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as any).glassType === opt.value
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -1382,12 +1553,11 @@ function ConfiguratorContent() {
                                     blindsColour: undefined,
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  !(config as any).blinds ||
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${!(config as any).blinds ||
                                   (config as any).blinds === "none"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-400 mb-2"
@@ -1416,11 +1586,10 @@ function ConfiguratorContent() {
                                       (config as any).blindsColour || "White",
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  (config as any).blinds === "mechanical"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${(config as any).blinds === "mechanical"
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-500 mb-2"
@@ -1513,11 +1682,10 @@ function ConfiguratorContent() {
                                           blindsColour: colour,
                                         } as any)
                                       }
-                                      className={`p-2 text-xs border rounded-lg transition-all text-center ${
-                                        (config as any).blindsColour === colour
-                                          ? "bg-sky-50 border-sky-300 text-sky-700 font-medium"
-                                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                      }`}
+                                      className={`p-2 text-xs border rounded-lg transition-all text-center ${(config as any).blindsColour === colour
+                                        ? "bg-sky-50 border-sky-300 text-sky-700 font-medium"
+                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                        }`}
                                     >
                                       {colour}
                                     </button>
@@ -1565,11 +1733,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as any).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-2 text-xs border rounded-lg transition-all ${(config as any).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -1709,8 +1876,8 @@ function ConfiguratorContent() {
                                     const newExtras = e.target.checked
                                       ? [...currentExtras, extra]
                                       : currentExtras.filter(
-                                          (ex) => ex !== extra,
-                                        );
+                                        (ex) => ex !== extra,
+                                      );
                                     updateConfig({
                                       extras: newExtras,
                                     } as any);
@@ -1801,11 +1968,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "standard" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "standard"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "standard"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -1821,11 +1987,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "low" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "low"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "low"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -1975,9 +2140,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as DoorConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as DoorConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as DoorConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -1992,7 +2157,7 @@ function ConfiguratorContent() {
                           </button>
                           <span className="text-smfont-medium w-4 text-center">
                             {typeof (config as DoorConfig).trickleVents ===
-                            "number"
+                              "number"
                               ? (config as DoorConfig).trickleVents
                               : (config as DoorConfig).trickleVents
                                 ? 1
@@ -2002,9 +2167,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as DoorConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as DoorConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as DoorConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -2067,28 +2232,28 @@ function ConfiguratorContent() {
 
                             {(config as DoorConfig).glassThickness !==
                               undefined && (
-                              <div className="flex items-center gap-2 ml-6">
-                                <span className="text-sm text-slate-600">
-                                  Glass Thickness
-                                </span>
-                                <input
-                                  type="number"
-                                  value={
-                                    (config as DoorConfig).glassThickness || ""
-                                  }
-                                  onChange={(e) =>
-                                    updateConfig({
-                                      glassThickness:
-                                        parseInt(e.target.value) || 0,
-                                    } as any)
-                                  }
-                                  className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
-                                />
-                                <span className="text-sm text-slate-600">
-                                  mm
-                                </span>
-                              </div>
-                            )}
+                                <div className="flex items-center gap-2 ml-6">
+                                  <span className="text-sm text-slate-600">
+                                    Glass Thickness
+                                  </span>
+                                  <input
+                                    type="number"
+                                    value={
+                                      (config as DoorConfig).glassThickness || ""
+                                    }
+                                    onChange={(e) =>
+                                      updateConfig({
+                                        glassThickness:
+                                          parseInt(e.target.value) || 0,
+                                      } as any)
+                                    }
+                                    className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                  />
+                                  <span className="text-sm text-slate-600">
+                                    mm
+                                  </span>
+                                </div>
+                              )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -2117,11 +2282,10 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as DoorConfig).glassType === opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as DoorConfig).glassType === opt.value
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -2149,11 +2313,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as DoorConfig).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as DoorConfig).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -2164,53 +2327,52 @@ function ConfiguratorContent() {
 
                         {(config as DoorConfig).glassType ===
                           "toughened_obscure" && (
-                          <div className="flex flex-col gap-2">
-                            <span className="text-sm text-slate-600">
-                              Obscure Pattern
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                              {[
-                                "Arctic (L5)",
-                                "Autumn (L3)",
-                                "Contora (L4)",
-                                "Cotswold (L5)",
-                                "Reeded (L2)",
-                                "Stippolyte (L4)",
-                                "Cassini (L5)",
-                                "Chantilly (L2)",
-                                "Charcoal Sticks (L4)",
-                                "Digital (L3)",
-                                "Everglade (L5)",
-                                "Flemish (L1)",
-                                "Florielle (L4)",
-                                "Mayflower (L4)",
-                                "Minster (L2)",
-                                "Oak (L4)",
-                                "Pelerine (L4)",
-                                "Sycamore (L2)",
-                                "Taffeta (L3)",
-                                "Warwick (L1)",
-                                "Satin",
-                              ].map((opt) => (
-                                <button
-                                  key={opt}
-                                  onClick={() =>
-                                    updateConfig({
-                                      glassPattern: opt,
-                                    } as any)
-                                  }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as DoorConfig).glassPattern === opt
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600">
+                                Obscure Pattern
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  "Arctic (L5)",
+                                  "Autumn (L3)",
+                                  "Contora (L4)",
+                                  "Cotswold (L5)",
+                                  "Reeded (L2)",
+                                  "Stippolyte (L4)",
+                                  "Cassini (L5)",
+                                  "Chantilly (L2)",
+                                  "Charcoal Sticks (L4)",
+                                  "Digital (L3)",
+                                  "Everglade (L5)",
+                                  "Flemish (L1)",
+                                  "Florielle (L4)",
+                                  "Mayflower (L4)",
+                                  "Minster (L2)",
+                                  "Oak (L4)",
+                                  "Pelerine (L4)",
+                                  "Sycamore (L2)",
+                                  "Taffeta (L3)",
+                                  "Warwick (L1)",
+                                  "Satin",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({
+                                        glassPattern: opt,
+                                      } as any)
+                                    }
+                                    className={`p-2 text-xs border rounded-lg transition-all ${(config as DoorConfig).glassPattern === opt
                                       ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
                                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
-                                >
-                                  {opt}
-                                </button>
-                              ))}
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </SectionCard>
 
@@ -2243,8 +2405,8 @@ function ConfiguratorContent() {
                                       const newExtras = e.target.checked
                                         ? [...currentExtras, extra]
                                         : currentExtras.filter(
-                                            (ex) => ex !== extra,
-                                          );
+                                          (ex) => ex !== extra,
+                                        );
                                       updateConfig({
                                         extras: newExtras,
                                       } as any);
@@ -2371,11 +2533,10 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as any).glassType === opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as any).glassType === opt.value
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -2398,12 +2559,11 @@ function ConfiguratorContent() {
                                     blindsColour: undefined,
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  !(config as any).blinds ||
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${!(config as any).blinds ||
                                   (config as any).blinds === "none"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-400 mb-2"
@@ -2432,11 +2592,10 @@ function ConfiguratorContent() {
                                       (config as any).blindsColour || "White",
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  (config as any).blinds === "mechanical"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${(config as any).blinds === "mechanical"
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-500 mb-2"
@@ -2529,11 +2688,10 @@ function ConfiguratorContent() {
                                           blindsColour: colour,
                                         } as any)
                                       }
-                                      className={`py-2 px-2 text-sm rounded-lg border transition-all ${
-                                        (config as any).blindsColour === colour
-                                          ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                      }`}
+                                      className={`py-2 px-2 text-sm rounded-lg border transition-all ${(config as any).blindsColour === colour
+                                        ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                        }`}
                                     >
                                       {colour}
                                     </button>
@@ -2565,11 +2723,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as any).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as any).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -2615,11 +2772,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as any).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-2 text-xs border rounded-lg transition-all ${(config as any).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -2690,11 +2846,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "standard" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "standard"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "standard"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -2710,11 +2865,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "low" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "low"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "low"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -2807,8 +2961,8 @@ function ConfiguratorContent() {
                                       const newExtras = e.target.checked
                                         ? [...currentExtras, extra]
                                         : currentExtras.filter(
-                                            (ex) => ex !== extra,
-                                          );
+                                          (ex) => ex !== extra,
+                                        );
                                       updateConfig({
                                         extras: newExtras,
                                       } as any);
@@ -2935,11 +3089,10 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as any).glassType === opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as any).glassType === opt.value
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -2962,12 +3115,11 @@ function ConfiguratorContent() {
                                     blindsColour: undefined,
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  !(config as any).blinds ||
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${!(config as any).blinds ||
                                   (config as any).blinds === "none"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-400 mb-2"
@@ -2996,11 +3148,10 @@ function ConfiguratorContent() {
                                       (config as any).blindsColour || "White",
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  (config as any).blinds === "mechanical"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${(config as any).blinds === "mechanical"
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-500 mb-2"
@@ -3093,11 +3244,10 @@ function ConfiguratorContent() {
                                           blindsColour: colour,
                                         } as any)
                                       }
-                                      className={`py-2 px-2 text-sm rounded-lg border transition-all ${
-                                        (config as any).blindsColour === colour
-                                          ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                      }`}
+                                      className={`py-2 px-2 text-sm rounded-lg border transition-all ${(config as any).blindsColour === colour
+                                        ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                        }`}
                                     >
                                       {colour}
                                     </button>
@@ -3129,11 +3279,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as any).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as any).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -3179,11 +3328,10 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as any).glassPattern === opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                  className={`p-2 text-xs border rounded-lg transition-all ${(config as any).glassPattern === opt
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -3212,11 +3360,10 @@ function ConfiguratorContent() {
                                 type: ProductType.Bifold,
                               } as any)
                             }
-                            className={`px-6 py-3 rounded-xl border text-sm font-semibold transition-all min-w-20 ${
-                              (config as BifoldConfig).panels === num
-                                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                            }`}
+                            className={`px-6 py-3 rounded-xl border text-sm font-semibold transition-all min-w-20 ${(config as BifoldConfig).panels === num
+                              ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                              : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                              }`}
                           >
                             {num}
                           </button>
@@ -3325,29 +3472,29 @@ function ConfiguratorContent() {
 
                             {(config as BifoldConfig).glassThickness !==
                               undefined && (
-                              <div className="flex items-center gap-2 ml-6">
-                                <span className="text-sm text-slate-600">
-                                  Glass Thickness
-                                </span>
-                                <input
-                                  type="number"
-                                  value={
-                                    (config as BifoldConfig).glassThickness ||
-                                    ""
-                                  }
-                                  onChange={(e) =>
-                                    updateConfig({
-                                      glassThickness:
-                                        parseInt(e.target.value) || 0,
-                                    } as any)
-                                  }
-                                  className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
-                                />
-                                <span className="text-sm text-slate-600">
-                                  mm
-                                </span>
-                              </div>
-                            )}
+                                <div className="flex items-center gap-2 ml-6">
+                                  <span className="text-sm text-slate-600">
+                                    Glass Thickness
+                                  </span>
+                                  <input
+                                    type="number"
+                                    value={
+                                      (config as BifoldConfig).glassThickness ||
+                                      ""
+                                    }
+                                    onChange={(e) =>
+                                      updateConfig({
+                                        glassThickness:
+                                          parseInt(e.target.value) || 0,
+                                      } as any)
+                                    }
+                                    className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                  />
+                                  <span className="text-sm text-slate-600">
+                                    mm
+                                  </span>
+                                </div>
+                              )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -3376,12 +3523,11 @@ function ConfiguratorContent() {
                                     glassPattern: defaultPattern,
                                   } as any);
                                 }}
-                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${
-                                  (config as BifoldConfig).glassType ===
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as BifoldConfig).glassType ===
                                   opt.value
-                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                }`}
+                                  ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -3409,12 +3555,11 @@ function ConfiguratorContent() {
                                       glassPattern: opt,
                                     } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as BifoldConfig).glassPattern ===
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as BifoldConfig).glassPattern ===
                                     opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -3425,54 +3570,53 @@ function ConfiguratorContent() {
 
                         {(config as BifoldConfig).glassType ===
                           "toughened_obscure" && (
-                          <div className="flex flex-col gap-2">
-                            <span className="text-sm text-slate-600">
-                              Obscure Pattern
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                              {[
-                                "Arctic (L5)",
-                                "Autumn (L3)",
-                                "Contora (L4)",
-                                "Cotswold (L5)",
-                                "Reeded (L2)",
-                                "Stippolyte (L4)",
-                                "Cassini (L5)",
-                                "Chantilly (L2)",
-                                "Charcoal Sticks (L4)",
-                                "Digital (L3)",
-                                "Everglade (L5)",
-                                "Flemish (L1)",
-                                "Florielle (L4)",
-                                "Mayflower (L4)",
-                                "Minster (L2)",
-                                "Oak (L4)",
-                                "Pelerine (L4)",
-                                "Sycamore (L2)",
-                                "Taffeta (L3)",
-                                "Warwick (L1)",
-                                "Satin",
-                              ].map((opt) => (
-                                <button
-                                  key={opt}
-                                  onClick={() =>
-                                    updateConfig({
-                                      glassPattern: opt,
-                                    } as any)
-                                  }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as BifoldConfig).glassPattern ===
-                                    opt
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600">
+                                Obscure Pattern
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  "Arctic (L5)",
+                                  "Autumn (L3)",
+                                  "Contora (L4)",
+                                  "Cotswold (L5)",
+                                  "Reeded (L2)",
+                                  "Stippolyte (L4)",
+                                  "Cassini (L5)",
+                                  "Chantilly (L2)",
+                                  "Charcoal Sticks (L4)",
+                                  "Digital (L3)",
+                                  "Everglade (L5)",
+                                  "Flemish (L1)",
+                                  "Florielle (L4)",
+                                  "Mayflower (L4)",
+                                  "Minster (L2)",
+                                  "Oak (L4)",
+                                  "Pelerine (L4)",
+                                  "Sycamore (L2)",
+                                  "Taffeta (L3)",
+                                  "Warwick (L1)",
+                                  "Satin",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({
+                                        glassPattern: opt,
+                                      } as any)
+                                    }
+                                    className={`p-2 text-xs border rounded-lg transition-all ${(config as BifoldConfig).glassPattern ===
+                                      opt
                                       ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
                                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
-                                >
-                                  {opt}
-                                </button>
-                              ))}
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </SectionCard>
 
@@ -3491,11 +3635,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "standard" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "standard"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "standard"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -3511,11 +3654,10 @@ function ConfiguratorContent() {
                           onClick={() =>
                             updateConfig({ threshold: "low" } as any)
                           }
-                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${
-                            (config as any).threshold === "low"
-                              ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
+                          className={`flex flex-col items-center p-3 border rounded-xl w-36 transition-all ${(config as any).threshold === "low"
+                            ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                            : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
                         >
                           <div className="h-12 w-full mb-2 relative">
                             <img
@@ -3549,12 +3691,11 @@ function ConfiguratorContent() {
                                     thresholdRamp: opt.value as any,
                                   } as any)
                                 }
-                                className={`py-3 px-2 text-sm border rounded-lg transition-all ${
-                                  ((config as BifoldConfig).thresholdRamp ||
-                                    "none") === opt.value
-                                    ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                className={`py-3 px-2 text-sm border rounded-lg transition-all ${((config as BifoldConfig).thresholdRamp ||
+                                  "none") === opt.value
+                                  ? "bg-orange-50 border-orange-300 ring-1 ring-orange-200"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -3583,7 +3724,7 @@ function ConfiguratorContent() {
                               <select
                                 value={
                                   (config as BifoldConfig).addons?.[
-                                    sideLower
+                                  sideLower
                                   ] || "None"
                                 }
                                 onChange={(e) => {
@@ -3700,9 +3841,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as BifoldConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as BifoldConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as BifoldConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -3717,9 +3858,9 @@ function ConfiguratorContent() {
                           </button>
                           <span className="text-smfont-medium w-4 text-center">
                             {typeof (config as BifoldConfig).trickleVents ===
-                            "number"
+                              "number"
                               ? ((config as BifoldConfig)
-                                  .trickleVents as number)
+                                .trickleVents as number)
                               : (config as BifoldConfig).trickleVents
                                 ? 1
                                 : 0}
@@ -3728,9 +3869,9 @@ function ConfiguratorContent() {
                             onClick={() => {
                               const current =
                                 typeof (config as BifoldConfig).trickleVents ===
-                                "number"
+                                  "number"
                                   ? ((config as BifoldConfig)
-                                      .trickleVents as number)
+                                    .trickleVents as number)
                                   : (config as BifoldConfig).trickleVents
                                     ? 1
                                     : 0;
@@ -3782,8 +3923,8 @@ function ConfiguratorContent() {
                                     const newExtras = e.target.checked
                                       ? [...currentExtras, extra]
                                       : currentExtras.filter(
-                                          (ex) => ex !== extra,
-                                        );
+                                        (ex) => ex !== extra,
+                                      );
                                     updateConfig({ extras: newExtras } as any);
                                   }}
                                   className="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500"
@@ -3828,11 +3969,10 @@ function ConfiguratorContent() {
                                 panels: num,
                               } as any)
                             }
-                            className={`px-6 py-3 rounded-xl border text-sm font-semibold transition-all min-w-28 ${
-                              (config as SliderConfig).panels === num
-                                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                            }`}
+                            className={`px-6 py-3 rounded-xl border text-sm font-semibold transition-all min-w-28 ${(config as SliderConfig).panels === num
+                              ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                              : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                              }`}
                           >
                             {num} Panes
                           </button>
@@ -3853,12 +3993,11 @@ function ConfiguratorContent() {
                             onClick={() =>
                               updateConfig({ slideDirection: opt.value } as any)
                             }
-                            className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all ${
-                              (config as SliderConfig).slideDirection ===
+                            className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all ${(config as SliderConfig).slideDirection ===
                               opt.value
-                                ? "bg-sky-50 border-sky-300"
-                                : "bg-white border-slate-200 hover:border-slate-300"
-                            }`}
+                              ? "bg-sky-50 border-sky-300"
+                              : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
                           >
                             <svg
                               className="w-16 h-16 mb-2"
@@ -3892,36 +4031,36 @@ function ConfiguratorContent() {
                               {/* Arrows based on direction */}
                               {(opt.value === "left" ||
                                 opt.value === "both") && (
-                                <>
-                                  <line
-                                    x1="32"
-                                    y1="40"
-                                    x2="18"
-                                    y2="40"
-                                    strokeWidth="2.5"
-                                  />
-                                  <polyline
-                                    points="22,36 18,40 22,44"
-                                    strokeWidth="2.5"
-                                  />
-                                </>
-                              )}
+                                  <>
+                                    <line
+                                      x1="32"
+                                      y1="40"
+                                      x2="18"
+                                      y2="40"
+                                      strokeWidth="2.5"
+                                    />
+                                    <polyline
+                                      points="22,36 18,40 22,44"
+                                      strokeWidth="2.5"
+                                    />
+                                  </>
+                                )}
                               {(opt.value === "right" ||
                                 opt.value === "both") && (
-                                <>
-                                  <line
-                                    x1="48"
-                                    y1="40"
-                                    x2="62"
-                                    y2="40"
-                                    strokeWidth="2.5"
-                                  />
-                                  <polyline
-                                    points="58,36 62,40 58,44"
-                                    strokeWidth="2.5"
-                                  />
-                                </>
-                              )}
+                                  <>
+                                    <line
+                                      x1="48"
+                                      y1="40"
+                                      x2="62"
+                                      y2="40"
+                                      strokeWidth="2.5"
+                                    />
+                                    <polyline
+                                      points="58,36 62,40 58,44"
+                                      strokeWidth="2.5"
+                                    />
+                                  </>
+                                )}
                               {/* Handle indicators */}
                               {opt.value === "left" && (
                                 <rect
@@ -4002,12 +4141,11 @@ function ConfiguratorContent() {
                                     color: c.value,
                                   } as any)
                                 }
-                                className={`group relative w-28 flex flex-col items-center gap-2 p-2 rounded-xl border-2 transition-all ${
-                                  (config as SliderConfig).outsideColor ===
+                                className={`group relative w-28 flex flex-col items-center gap-2 p-2 rounded-xl border-2 transition-all ${(config as SliderConfig).outsideColor ===
                                   c.value
-                                    ? "border-sky-300 bg-sky-50"
-                                    : "border-slate-200 hover:border-slate-300 bg-white"
-                                }`}
+                                  ? "border-sky-300 bg-sky-50"
+                                  : "border-slate-200 hover:border-slate-300 bg-white"
+                                  }`}
                               >
                                 <div className="w-24 h-14 rounded border border-gray-200 overflow-hidden shadow-sm">
                                   <img
@@ -4034,8 +4172,8 @@ function ConfiguratorContent() {
                                     config as SliderConfig
                                   ).outsideColor?.startsWith("RAL")
                                     ? (
-                                        config as SliderConfig
-                                      ).outsideColor.replace("RAL ", "")
+                                      config as SliderConfig
+                                    ).outsideColor.replace("RAL ", "")
                                     : ""
                                 }
                                 onChange={(e) => {
@@ -4091,12 +4229,11 @@ function ConfiguratorContent() {
                                 onClick={() =>
                                   updateConfig({ insideColor: c.value } as any)
                                 }
-                                className={`group relative w-28 flex flex-col items-center gap-2 p-2 rounded-xl border-2 transition-all ${
-                                  (config as SliderConfig).insideColor ===
+                                className={`group relative w-28 flex flex-col items-center gap-2 p-2 rounded-xl border-2 transition-all ${(config as SliderConfig).insideColor ===
                                   c.value
-                                    ? "border-sky-300 bg-sky-50"
-                                    : "border-slate-200 hover:border-slate-300 bg-white"
-                                }`}
+                                  ? "border-sky-300 bg-sky-50"
+                                  : "border-slate-200 hover:border-slate-300 bg-white"
+                                  }`}
                               >
                                 <div className="w-24 h-14 rounded border border-gray-200 overflow-hidden shadow-sm">
                                   <img
@@ -4123,8 +4260,8 @@ function ConfiguratorContent() {
                                     config as SliderConfig
                                   ).insideColor?.startsWith("RAL")
                                     ? (
-                                        config as SliderConfig
-                                      ).insideColor.replace("RAL ", "")
+                                      config as SliderConfig
+                                    ).insideColor.replace("RAL ", "")
                                     : ""
                                 }
                                 onChange={(e) => {
@@ -4185,11 +4322,10 @@ function ConfiguratorContent() {
                               onClick={() =>
                                 updateConfig({ cill: c.value } as any)
                               }
-                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all h-28 justify-between ${
-                                (config as SliderConfig).cill === c.value
-                                  ? "bg-sky-50 border-sky-300"
-                                  : "bg-white border-slate-200 hover:border-slate-300"
-                              }`}
+                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all h-28 justify-between ${(config as SliderConfig).cill === c.value
+                                ? "bg-sky-50 border-sky-300"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
                             >
                               <div className="flex-1 flex items-center justify-center w-full">
                                 {c.img ? (
@@ -4329,12 +4465,11 @@ function ConfiguratorContent() {
                               onClick={() =>
                                 updateConfig({ hardwareColor: h.value } as any)
                               }
-                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
-                                (config as SliderConfig).hardwareColor ===
+                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${(config as SliderConfig).hardwareColor ===
                                 h.value
-                                  ? "border-sky-300 bg-sky-50"
-                                  : "border-slate-200 hover:border-slate-300 bg-white"
-                              }`}
+                                ? "border-sky-300 bg-sky-50"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                                }`}
                             >
                               <div className="h-16 w-16 mb-2 relative flex items-center justify-center">
                                 <img
@@ -4372,12 +4507,11 @@ function ConfiguratorContent() {
                               onClick={() =>
                                 updateConfig({ hardwareColor: h.value } as any)
                               }
-                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
-                                (config as SliderConfig).hardwareColor ===
+                              className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${(config as SliderConfig).hardwareColor ===
                                 h.value
-                                  ? "border-sky-300 bg-sky-50"
-                                  : "border-slate-200 hover:border-slate-300 bg-white"
-                              }`}
+                                ? "border-sky-300 bg-sky-50"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                                }`}
                             >
                               <div className="h-16 w-16 mb-2 relative flex items-center justify-center">
                                 <img
@@ -4470,11 +4604,10 @@ function ConfiguratorContent() {
                                   blindsColour: undefined,
                                 } as any);
                               }}
-                              className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all ${
-                                (config as SliderConfig).glassType === opt.value
-                                  ? "bg-sky-50 border-sky-300"
-                                  : "bg-white border-slate-200 hover:border-slate-300"
-                              }`}
+                              className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all ${(config as SliderConfig).glassType === opt.value
+                                ? "bg-sky-50 border-sky-300"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
                             >
                               {opt.value === "unglazed" && (
                                 <svg
@@ -4626,12 +4759,11 @@ function ConfiguratorContent() {
                                     blindsColour: undefined,
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  !(config as SliderConfig).blinds ||
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${!(config as SliderConfig).blinds ||
                                   (config as SliderConfig).blinds === "none"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-400 mb-2"
@@ -4658,12 +4790,11 @@ function ConfiguratorContent() {
                                       (config as any).blindsColour || "White",
                                   } as any)
                                 }
-                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${
-                                  (config as SliderConfig).blinds ===
+                                className={`flex flex-col items-center justify-center p-5 border-2 rounded-xl transition-all ${(config as SliderConfig).blinds ===
                                   "mechanical"
-                                    ? "bg-sky-50 border-sky-300"
-                                    : "bg-white border-slate-200 hover:border-slate-300"
-                                }`}
+                                  ? "bg-sky-50 border-sky-300"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                  }`}
                               >
                                 <svg
                                   className="w-10 h-10 text-slate-500 mb-2"
@@ -4729,46 +4860,45 @@ function ConfiguratorContent() {
 
                             {(config as SliderConfig).blinds ===
                               "mechanical" && (
-                              <div className="flex flex-col gap-2 mt-2">
-                                <span className="text-sm text-slate-600 font-medium">
-                                  Blinds Colour
-                                </span>
-                                <div className="grid grid-cols-4 gap-2">
-                                  {[
-                                    "White",
-                                    "Yellow",
-                                    "Agate Grey",
-                                    "Beige",
-                                    "Green",
-                                    "Light Blue",
-                                    "Cream",
-                                    "Light Grey",
-                                    "Metallic Silver",
-                                    "Silver",
-                                    "Slate Grey",
-                                    "Anthracite",
-                                    "Black",
-                                  ].map((colour) => (
-                                    <button
-                                      key={colour}
-                                      onClick={() =>
-                                        updateConfig({
-                                          blindsColour: colour,
-                                        } as any)
-                                      }
-                                      className={`py-2 px-2 text-sm rounded-lg border transition-all ${
-                                        (config as SliderConfig)
+                                <div className="flex flex-col gap-2 mt-2">
+                                  <span className="text-sm text-slate-600 font-medium">
+                                    Blinds Colour
+                                  </span>
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {[
+                                      "White",
+                                      "Yellow",
+                                      "Agate Grey",
+                                      "Beige",
+                                      "Green",
+                                      "Light Blue",
+                                      "Cream",
+                                      "Light Grey",
+                                      "Metallic Silver",
+                                      "Silver",
+                                      "Slate Grey",
+                                      "Anthracite",
+                                      "Black",
+                                    ].map((colour) => (
+                                      <button
+                                        key={colour}
+                                        onClick={() =>
+                                          updateConfig({
+                                            blindsColour: colour,
+                                          } as any)
+                                        }
+                                        className={`py-2 px-2 text-sm rounded-lg border transition-all ${(config as SliderConfig)
                                           .blindsColour === colour
                                           ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
                                           : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                      }`}
-                                    >
-                                      {colour}
-                                    </button>
-                                  ))}
+                                          }`}
+                                      >
+                                        {colour}
+                                      </button>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
                           </div>
                         )}
 
@@ -4791,12 +4921,11 @@ function ConfiguratorContent() {
                                   onClick={() =>
                                     updateConfig({ glassPattern: opt } as any)
                                   }
-                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${
-                                    (config as SliderConfig).glassPattern ===
+                                  className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as SliderConfig).glassPattern ===
                                     opt
-                                      ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
+                                    ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -4808,52 +4937,51 @@ function ConfiguratorContent() {
                         {/* Toughened Obscure Patterns */}
                         {(config as SliderConfig).glassType ===
                           "toughened_obscure" && (
-                          <div className="flex flex-col gap-2">
-                            <span className="text-sm text-slate-600">
-                              Obscure Pattern
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                              {[
-                                "Arctic (L5)",
-                                "Autumn (L3)",
-                                "Contora (L4)",
-                                "Cotswold (L5)",
-                                "Reeded (L2)",
-                                "Stippolyte (L4)",
-                                "Cassini (L5)",
-                                "Chantilly (L2)",
-                                "Charcoal Sticks (L4)",
-                                "Digital (L3)",
-                                "Everglade (L5)",
-                                "Flemish (L1)",
-                                "Florielle (L4)",
-                                "Mayflower (L4)",
-                                "Minster (L2)",
-                                "Oak (L4)",
-                                "Pelerine (L4)",
-                                "Sycamore (L2)",
-                                "Taffeta (L3)",
-                                "Warwick (L1)",
-                                "Satin",
-                              ].map((opt) => (
-                                <button
-                                  key={opt}
-                                  onClick={() =>
-                                    updateConfig({ glassPattern: opt } as any)
-                                  }
-                                  className={`p-2 text-xs border rounded-lg transition-all ${
-                                    (config as SliderConfig).glassPattern ===
-                                    opt
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600">
+                                Obscure Pattern
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  "Arctic (L5)",
+                                  "Autumn (L3)",
+                                  "Contora (L4)",
+                                  "Cotswold (L5)",
+                                  "Reeded (L2)",
+                                  "Stippolyte (L4)",
+                                  "Cassini (L5)",
+                                  "Chantilly (L2)",
+                                  "Charcoal Sticks (L4)",
+                                  "Digital (L3)",
+                                  "Everglade (L5)",
+                                  "Flemish (L1)",
+                                  "Florielle (L4)",
+                                  "Mayflower (L4)",
+                                  "Minster (L2)",
+                                  "Oak (L4)",
+                                  "Pelerine (L4)",
+                                  "Sycamore (L2)",
+                                  "Taffeta (L3)",
+                                  "Warwick (L1)",
+                                  "Satin",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({ glassPattern: opt } as any)
+                                    }
+                                    className={`p-2 text-xs border rounded-lg transition-all ${(config as SliderConfig).glassPattern ===
+                                      opt
                                       ? "bg-orange-50 border-orange-500 text-orange-700 font-medium"
                                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                                  }`}
-                                >
-                                  {opt}
-                                </button>
-                              ))}
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </SectionCard>
 
@@ -5043,7 +5171,7 @@ function ConfiguratorContent() {
                               onClick={() =>
                                 setSelectedPane(
                                   (selectedPane + 1) %
-                                    ((config as SliderConfig).panels || 2),
+                                  ((config as SliderConfig).panels || 2),
                                 )
                               }
                               className="px-5 py-2 bg-orange-500 text-white rounded-full text-sm font-semibold hover:bg-orange-600 transition-colors shadow-sm"
@@ -5062,11 +5190,10 @@ function ConfiguratorContent() {
                                   }).map((_, i) => (
                                     <div
                                       key={i}
-                                      className={`flex-1 h-full border-r-2 last:border-r-0 relative cursor-pointer transition-colors ${
-                                        selectedPane === i
-                                          ? "bg-sky-200/50"
-                                          : "bg-sky-100/30"
-                                      }`}
+                                      className={`flex-1 h-full border-r-2 last:border-r-0 relative cursor-pointer transition-colors ${selectedPane === i
+                                        ? "bg-sky-200/50"
+                                        : "bg-sky-100/30"
+                                        }`}
                                       style={{ borderColor: "#334155" }}
                                       onClick={() => setSelectedPane(i)}
                                     >
