@@ -163,6 +163,22 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       }
       break;
     }
+
+    case ProductType.Rooflight: {
+      if (width < 600) {
+        return { isValid: false, message: "Rooflight min width is 600mm" };
+      }
+      if (width > 3000) {
+        return { isValid: false, message: "Rooflight max width is 3000mm" };
+      }
+      if (height < 600) {
+        return { isValid: false, message: "Rooflight min height is 600mm" };
+      }
+      if (height > 2500) {
+        return { isValid: false, message: "Rooflight max height is 2500mm" };
+      }
+      break;
+    }
   }
 
   return { isValid: true };

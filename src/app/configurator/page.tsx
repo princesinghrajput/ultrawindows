@@ -14,6 +14,7 @@ import {
   ShapedConfig,
   FixedConfig,
   BayConfig,
+  RoofConfig,
 } from "../../types/product";
 import BifoldVisualizer from "../../components/configurator/visualizers/RealisticBifoldVisualizer";
 import RealisticAluminiumWindowVisualizer from "../../components/configurator/visualizers/RealisticAluminiumWindowVisualizer";
@@ -30,6 +31,7 @@ import RealisticSliderVisualizer from "../../components/configurator/visualizers
 import RealisticShapedFrameVisualizer from "../../components/configurator/visualizers/RealisticShapedFrameVisualizer";
 import RealisticFixedFrameVisualizer from "../../components/configurator/visualizers/RealisticFixedFrameVisualizer";
 import BayWindowDiagram from "../../components/configurator/visualizers/BayWindowDiagram";
+import RooflightVisualizer from "../../components/configurator/visualizers/RooflightVisualizer";
 import SidelightModal from "../../components/configurator/sections/SidelightModal";
 import { calculateBifoldPrice } from "../../utils/pricing";
 import PriceSummary from "../../components/configurator/PriceSummary";
@@ -298,6 +300,17 @@ function ConfiguratorContent() {
         pas24: false,
         location: "",
       } as BayConfig);
+    } else if (type === ProductType.Rooflight) {
+      setConfig({
+        ...baseConfig,
+        type: ProductType.Rooflight,
+        width: 3000,
+        height: 1200,
+        bars: 0,
+        outsideColor: "white",
+        insideColor: "white",
+        location: "",
+      } as RoofConfig);
     } else {
       setConfig({ ...baseConfig, type } as any);
     }
@@ -344,6 +357,8 @@ function ConfiguratorContent() {
       handleProductSelect(ProductType.Fixed);
     } else if (typeParam === "bay") {
       handleProductSelect(ProductType.Bay);
+    } else if (typeParam === "rooflight") {
+      handleProductSelect(ProductType.Rooflight);
     } else {
       router.replace("/portal/quotes");
     }
@@ -492,6 +507,14 @@ function ConfiguratorContent() {
                       <div className="w-full h-full flex items-center justify-center bg-white p-3">
                         <BayWindowDiagram
                           numberOfPanes={(config as BayConfig).numberOfPanes || 3}
+                        />
+                      </div>
+                    ) : config.type === ProductType.Rooflight ? (
+                      <div className="w-full h-full flex items-center justify-center bg-white p-3">
+                        <RooflightVisualizer
+                          width={config.width}
+                          height={config.height}
+                          outsideColor={(config as RoofConfig).outsideColor || "white"}
                         />
                       </div>
                     ) : (
@@ -1930,8 +1953,8 @@ function ConfiguratorContent() {
                               } as any)
                             }
                             className={`px-6 py-2.5 text-sm font-medium rounded-lg border-2 transition-all min-w-[120px] ${(config as BayConfig).frameSystem === opt.value
-                                ? "bg-sky-500 border-sky-500 text-white shadow-md"
-                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                              ? "bg-sky-500 border-sky-500 text-white shadow-md"
+                              : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                               }`}
                           >
                             {opt.label}
@@ -1971,8 +1994,8 @@ function ConfiguratorContent() {
                                 } as any);
                               }}
                               className={`px-5 py-2 text-sm font-medium rounded-lg border-2 transition-all min-w-[90px] ${(config as BayConfig).numberOfPanes === n
-                                  ? "bg-sky-500 border-sky-500 text-white shadow-md"
-                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                ? "bg-sky-500 border-sky-500 text-white shadow-md"
+                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                                 }`}
                             >
                               {n} Panes
@@ -2007,8 +2030,8 @@ function ConfiguratorContent() {
                                 } as any);
                               }}
                               className={`px-5 py-2 text-sm font-medium rounded-lg border-2 transition-all min-w-[90px] ${(config as BayConfig).numberOfPanes === n
-                                  ? "bg-sky-500 border-sky-500 text-white shadow-md"
-                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                ? "bg-sky-500 border-sky-500 text-white shadow-md"
+                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                                 }`}
                             >
                               {n} Panes
@@ -2139,10 +2162,10 @@ function ConfiguratorContent() {
                               } as any)
                             }
                             className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as BayConfig).outsideColor ===
-                                color.value &&
-                                !(config as BayConfig).outsideRAL
-                                ? "bg-sky-50 border-sky-400"
-                                : "bg-white border-slate-200 hover:border-slate-300"
+                              color.value &&
+                              !(config as BayConfig).outsideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200 hover:border-slate-300"
                               }`}
                           >
                             <div
@@ -2156,8 +2179,8 @@ function ConfiguratorContent() {
 
                         <div
                           className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as BayConfig).outsideRAL
-                              ? "bg-sky-50 border-sky-400"
-                              : "bg-white border-slate-200"
+                            ? "bg-sky-50 border-sky-400"
+                            : "bg-white border-slate-200"
                             }`}
                         >
                           <span className="text-xs text-slate-500 mb-1">
@@ -2207,10 +2230,10 @@ function ConfiguratorContent() {
                               } as any)
                             }
                             className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as BayConfig).insideColor ===
-                                color.value &&
-                                !(config as BayConfig).insideRAL
-                                ? "bg-sky-50 border-sky-400"
-                                : "bg-white border-slate-200 hover:border-slate-300"
+                              color.value &&
+                              !(config as BayConfig).insideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200 hover:border-slate-300"
                               }`}
                           >
                             <div
@@ -2224,8 +2247,8 @@ function ConfiguratorContent() {
 
                         <div
                           className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as BayConfig).insideRAL
-                              ? "bg-sky-50 border-sky-400"
-                              : "bg-white border-slate-200"
+                            ? "bg-sky-50 border-sky-400"
+                            : "bg-white border-slate-200"
                             }`}
                         >
                           <span className="text-xs text-slate-500 mb-1">
@@ -2275,8 +2298,8 @@ function ConfiguratorContent() {
                               updateConfig({ cill: opt.value } as any)
                             }
                             className={`flex flex-col items-center justify-center p-3 border-2 rounded-xl w-24 h-24 transition-all ${(config as BayConfig).cill === opt.value
-                                ? "bg-sky-50 border-sky-400"
-                                : "bg-white border-slate-200 hover:border-slate-300"
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200 hover:border-slate-300"
                               }`}
                           >
                             {opt.hasIcon ? (
@@ -2410,9 +2433,9 @@ function ConfiguratorContent() {
                                   } as any);
                                 }}
                                 className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as BayConfig).glassType ===
-                                    opt.value
-                                    ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
-                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  opt.value
+                                  ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                                   }`}
                               >
                                 {opt.label}
@@ -2442,8 +2465,8 @@ function ConfiguratorContent() {
                                     } as any)
                                   }
                                   className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as BayConfig).glassPattern === opt
-                                      ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
-                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                    ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                                     }`}
                                 >
                                   {opt}
@@ -2491,8 +2514,8 @@ function ConfiguratorContent() {
                                       } as any)
                                     }
                                     className={`p-2 text-xs border rounded-lg transition-all ${(config as BayConfig).glassPattern === opt
-                                        ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
-                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                      ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                                       }`}
                                   >
                                     {opt}
@@ -2501,6 +2524,190 @@ function ConfiguratorContent() {
                               </div>
                             </div>
                           )}
+                      </div>
+                    </SectionCard>
+
+                    {/* Notes */}
+                    <SectionCard title="Notes">
+                      <div>
+                        <textarea
+                          value={config.notes || ""}
+                          onChange={(e) =>
+                            updateConfig({ notes: e.target.value } as any)
+                          }
+                          placeholder="Add any notes to the item here"
+                          className="w-full h-24 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-y"
+                        />
+                      </div>
+                    </SectionCard>
+
+                    {/* Validation */}
+                    {!validation.isValid && (
+                      <div className="text-red-600 text-sm font-medium bg-red-50 px-4 py-3 rounded-lg border border-red-100">
+                        <p className="font-semibold mb-1">
+                          Invalid configuration, please go back and change the
+                          options to satisfy this criteria
+                        </p>
+                        <ul className="list-disc ml-4">
+                          <li>{validation.message}</li>
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* ── ROOFLIGHT CONTROLS ── */}
+                {config.type === ProductType.Rooflight && (
+                  <>
+                    {/* Location */}
+                    <SectionCard title="Location">
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-4 h-4 text-slate-400" />
+                        <input
+                          type="text"
+                          value={(config as RoofConfig).location || ""}
+                          onChange={(e) =>
+                            updateConfig({ location: e.target.value } as any)
+                          }
+                          placeholder="e.g. Extension, Kitchen"
+                          className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                        />
+                      </div>
+                    </SectionCard>
+
+                    {/* Outside Frame Colour */}
+                    <SectionCard title="Outside Frame Colour">
+                      <div className="flex flex-wrap gap-3 items-start">
+                        {[
+                          { label: "White", value: "white", bg: "bg-gray-200" },
+                          { label: "Black", value: "black", bg: "bg-black" },
+                          { label: "Grey", value: "grey", bg: "bg-slate-600" },
+                        ].map((color) => (
+                          <button
+                            key={color.value}
+                            onClick={() =>
+                              updateConfig({
+                                outsideColor: color.value,
+                                outsideRAL: undefined,
+                              } as any)
+                            }
+                            className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).outsideColor ===
+                                color.value &&
+                                !(config as RoofConfig).outsideRAL
+                                ? "bg-sky-50 border-sky-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                          >
+                            <div
+                              className={`w-full h-12 rounded-lg ${color.bg} border border-slate-300`}
+                            />
+                            <span className="text-xs font-semibold text-slate-700 mt-2">
+                              {color.label}
+                            </span>
+                          </button>
+                        ))}
+
+                        <div
+                          className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).outsideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200"
+                            }`}
+                        >
+                          <span className="text-xs text-slate-500 mb-1">
+                            RAL Colour
+                          </span>
+                          <input
+                            type="text"
+                            value={(config as RoofConfig).outsideRAL || "0000"}
+                            onChange={(e) =>
+                              updateConfig({
+                                outsideRAL: e.target.value,
+                                outsideColor: `RAL ${e.target.value}`,
+                              } as any)
+                            }
+                            className="w-full text-center border border-slate-200 rounded px-1 py-1 text-sm focus:outline-none focus:border-orange-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const ral =
+                                (config as RoofConfig).outsideRAL || "0000";
+                              updateConfig({
+                                outsideRAL: ral,
+                                outsideColor: `RAL ${ral}`,
+                              } as any);
+                            }}
+                            className="mt-1 px-3 py-1 bg-orange-500 text-white text-xs rounded font-medium hover:bg-orange-600 transition-colors"
+                          >
+                            Add RAL
+                          </button>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Inside Frame Colour */}
+                    <SectionCard title="Inside Frame Colour">
+                      <div className="flex flex-wrap gap-3 items-start">
+                        {[
+                          { label: "White", value: "white", bg: "bg-gray-200" },
+                        ].map((color) => (
+                          <button
+                            key={color.value}
+                            onClick={() =>
+                              updateConfig({
+                                insideColor: color.value,
+                                insideRAL: undefined,
+                              } as any)
+                            }
+                            className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).insideColor ===
+                                color.value &&
+                                !(config as RoofConfig).insideRAL
+                                ? "bg-sky-50 border-sky-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                          >
+                            <div
+                              className={`w-full h-12 rounded-lg ${color.bg} border border-slate-300`}
+                            />
+                            <span className="text-xs font-semibold text-slate-700 mt-2">
+                              {color.label}
+                            </span>
+                          </button>
+                        ))}
+
+                        <div
+                          className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).insideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200"
+                            }`}
+                        >
+                          <span className="text-xs text-slate-500 mb-1">
+                            RAL Colour
+                          </span>
+                          <input
+                            type="text"
+                            value={(config as RoofConfig).insideRAL || "0000"}
+                            onChange={(e) =>
+                              updateConfig({
+                                insideRAL: e.target.value,
+                                insideColor: `RAL ${e.target.value}`,
+                              } as any)
+                            }
+                            className="w-full text-center border border-slate-200 rounded px-1 py-1 text-sm focus:outline-none focus:border-orange-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const ral =
+                                (config as RoofConfig).insideRAL || "0000";
+                              updateConfig({
+                                insideRAL: ral,
+                                insideColor: `RAL ${ral}`,
+                              } as any);
+                            }}
+                            className="mt-1 px-3 py-1 bg-orange-500 text-white text-xs rounded font-medium hover:bg-orange-600 transition-colors"
+                          >
+                            Add RAL
+                          </button>
+                        </div>
                       </div>
                     </SectionCard>
 

@@ -235,6 +235,11 @@ export interface BayConfig extends BaseConfig {
 export interface RoofConfig extends BaseConfig {
   type: ProductType.Rooflight | ProductType.Lantern;
   bars: number;
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  location?: string;
 }
 
 export type ProductConfig =
