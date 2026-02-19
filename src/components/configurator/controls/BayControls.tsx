@@ -1,11 +1,11 @@
-import React from "react";
+import { ValidationResult } from "../../../utils/validation";
 import { BayConfig } from "../../../types/product";
 import SectionCard from "../sections/SectionCard";
 
 interface BayControlsProps {
     config: BayConfig;
     onUpdate: (updates: Partial<BayConfig>) => void;
-    validation: { isValid: boolean; message: string };
+    validation: ValidationResult;
 }
 
 export default function BayControls({ config, onUpdate, validation }: BayControlsProps) {
