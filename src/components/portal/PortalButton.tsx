@@ -23,11 +23,11 @@ const PortalButton = forwardRef<HTMLButtonElement, PortalButtonProps>(
         ref
     ) => {
         const baseStyles =
-            "inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed";
+            "inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed transform active:scale-[0.98]";
 
         const variants = {
             primary:
-                "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500 disabled:opacity-60 disabled:shadow-none",
+                "bg-orange-500 text-white shadow-md shadow-orange-500/20 hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/30 focus:ring-orange-500 disabled:opacity-60 disabled:shadow-none",
             secondary:
                 "bg-white text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 focus:ring-slate-300 disabled:opacity-60",
             ghost:

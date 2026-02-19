@@ -3,23 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Building2, Mail, Phone, Lock, ShieldCheck } from "lucide-react";
+import { ShieldCheck, ArrowRight, User, Mail, Lock } from "lucide-react";
 import AuthLayout from "@/components/portal/AuthLayout";
 import FormInput from "@/components/portal/FormInput";
 import PortalButton from "@/components/portal/PortalButton";
-import {
-  registerSchema,
-  type RegisterPayload,
-} from "@/lib/validation/auth";
+import { registerSchema, type RegisterPayload } from "@/lib/validation/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<RegisterPayload>({
     fullName: "",
-    company: "",
     email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
     terms: false,
@@ -36,7 +31,6 @@ export default function RegisterPage() {
     }
     const nextErrors: Record<string, string> = {};
     parsed.error.issues.forEach((issue) => {
-      console.log(issue);
       if (issue.path[0]) {
         nextErrors[issue.path[0] as string] = issue.message;
       }
@@ -52,72 +46,62 @@ export default function RegisterPage() {
     setLoading(true);
     setServerMessage(null);
 
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const payload = await response.json();
-    setLoading(false);
+      const payload = await response.json();
+      setLoading(false);
 
-    if (!response.ok) {
-      setServerMessage(payload?.message ?? "Unable to submit your request.");
-      return;
+      if (!response.ok) {
+        setServerMessage(payload?.message ?? "Unable to submit your request.");
+        return;
+      }
+
+      setShowSuccessState(true);
+      setServerMessage(null);
+
+      // Optional: Auto redirect
+      setTimeout(() => {
+        const search = new URLSearchParams({ email: formData.email }).toString();
+        router.push(`/portal/pending?${search}`);
+      }, 3000);
+
+    } catch (error) {
+      setLoading(false);
+      setServerMessage("Something went wrong. Please try again.");
     }
-
-    setShowSuccessState(true);
-    setServerMessage(null);
-
-    setTimeout(() => {
-      const search = new URLSearchParams({ email: formData.email }).toString();
-      router.push(`/portal/pending?${search}`);
-    }, 1800);
   };
-
-  // Password strength indicator
-  const getPasswordStrength = () => {
-    const { password } = formData;
-    if (!password) return { strength: 0, label: "", color: "" };
-
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-    const levels = [
-      { label: "Weak", color: "bg-red-500" },
-      { label: "Fair", color: "bg-orange-500" },
-      { label: "Good", color: "bg-yellow-500" },
-      { label: "Strong", color: "bg-green-500" },
-    ];
-
-    return { strength, ...levels[Math.min(strength - 1, 3)] };
-  };
-
-  const passwordStrength = getPasswordStrength();
 
   if (showSuccessState) {
     return (
       <AuthLayout
-        title="Request Received"
-        subtitle="Thanks for submitting your details"
+        title="Registration Successful"
+        subtitle="Your account is under review"
       >
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-4 shadow-lg">
-          <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center">
-            <ShieldCheck className="w-9 h-9 text-emerald-500" />
+        <div className="text-center space-y-6">
+          <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center animate-in zoom-in duration-300">
+            <ShieldCheck className="w-10 h-10 text-emerald-500" />
           </div>
-          <h2 className="text-2xl font-semibold text-slate-900">
-            You're in the queue
-          </h2>
-          <p className="text-slate-600 leading-relaxed">
-            Our onboarding team is reviewing your access request. This usually
-            takes a few hours during business days.
-          </p>
-          <p className="text-sm text-slate-500">
-            We&apos;ll email you once your portal access has been approved.
-          </p>
+
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold text-slate-900">You're in the queue</h2>
+            <p className="text-slate-600 leading-relaxed">
+              Thanks for registering, <span className="font-semibold text-slate-900">{formData.fullName}</span>.
+              Our team is reviewing your request. We'll email you at <span className="font-medium text-slate-900">{formData.email}</span> once approved.
+            </p>
+          </div>
+
+          <div className="pt-6">
+            <Link href="/portal/login">
+              <PortalButton variant="secondary" className="w-full">
+                Return to Login
+              </PortalButton>
+            </Link>
+          </div>
         </div>
       </AuthLayout>
     );
@@ -125,176 +109,96 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Request Customer Portal Access"
-      subtitle="Submit your details and our team will activate your account"
+      title="Create Account"
+      subtitle="Join the portal to start managing your orders"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="p-3 rounded-lg bg-slate-50 border border-slate-100 mb-2">
-          <p className="text-sm text-slate-600 leading-relaxed">
-            <span className="font-medium text-slate-700">Note:</span> This
-            portal is restricted to verified customers. Your request will be
-            reviewed by our team.
-          </p>
-        </div>
-
+      <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {serverMessage && (
-          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
             {serverMessage}
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <FormInput
             label="Full Name"
             type="text"
-            placeholder="John Smith"
+            placeholder="John Doe"
             icon={<User className="w-5 h-5" />}
             value={formData.fullName}
-            onChange={(e) =>
-              setFormData({ ...formData, fullName: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
             error={errors.fullName}
           />
 
           <FormInput
-            label="Company Name"
-            type="text"
-            placeholder="Acme Ltd"
-            icon={<Building2 className="w-5 h-5" />}
-            value={formData.company}
-            onChange={(e) =>
-              setFormData({ ...formData, company: e.target.value })
-            }
-            error={errors.company}
+            label="Work Email"
+            type="email"
+            placeholder="you@company.com"
+            icon={<Mail className="w-5 h-5" />}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            error={errors.email}
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              label="Password"
+              type="password"
+              placeholder="Min 8 chars"
+              icon={<Lock className="w-5 h-5" />}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              error={errors.password}
+            />
+
+            <FormInput
+              label="Confirm"
+              type="password"
+              placeholder="Confirm password"
+              icon={<Lock className="w-5 h-5" />}
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              error={errors.confirmPassword}
+            />
+          </div>
         </div>
 
-        <FormInput
-          label="Work Email"
-          type="email"
-          placeholder="you@company.com"
-          icon={<Mail className="w-5 h-5" />}
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          error={errors.email}
-        />
-
-        <FormInput
-          label="Phone Number"
-          type="tel"
-          placeholder="+44 7700 900000"
-          icon={<Phone className="w-5 h-5" />}
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          error={errors.phone}
-        />
-
-        <FormInput
-          label="Create Password"
-          type="password"
-          placeholder="At least 8 characters"
-          icon={<Lock className="w-5 h-5" />}
-          value={formData.password}
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
-          error={errors.password}
-        />
-
-        {formData.password && (
-          <div className="space-y-1.5">
-            <div className="flex gap-1">
-              {[1, 2, 3, 4].map((level) => (
-                <div
-                  key={level}
-                  className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength.strength
-                    ? passwordStrength.color
-                    : "bg-slate-200"
-                    }`}
-                />
-              ))}
-            </div>
-            <p className="text-xs text-slate-500">
-              Password strength:{" "}
-              <span className="font-medium">{passwordStrength.label}</span>
-            </p>
-          </div>
-        )}
-
-        <FormInput
-          label="Confirm Password"
-          type="password"
-          placeholder="Re-enter your password"
-          icon={<Lock className="w-5 h-5" />}
-          value={formData.confirmPassword}
-          onChange={(e) =>
-            setFormData({ ...formData, confirmPassword: e.target.value })
-          }
-          error={errors.confirmPassword}
-        />
-
-        <div className="pt-2">
-          <label className="flex items-start gap-3 cursor-pointer">
+        <div className="flex items-center gap-3 pt-1">
+          <div className="flex items-center h-5">
             <input
               type="checkbox"
+              id="terms"
               checked={formData.terms}
-              onChange={(e) =>
-                setFormData({ ...formData, terms: e.target.checked })
-              }
-              className="w-4 h-4 mt-0.5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+              onChange={(e) => setFormData({ ...formData, terms: e.target.checked })}
+              className="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
             />
-            <span className="text-sm text-slate-600 leading-relaxed">
-              I agree to the{" "}
-              <a
-                href="#"
-                className="text-orange-600 hover:text-orange-700 font-medium"
-              >
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a
-                href="#"
-                className="text-orange-600 hover:text-orange-700 font-medium"
-              >
-                Privacy Policy
-              </a>
-            </span>
+          </div>
+          <label htmlFor="terms" className="text-sm text-slate-600 cursor-pointer select-none">
+            I agree to the <a href="#" className="text-slate-900 font-medium hover:underline">Terms of Service</a> and <a href="#" className="text-slate-900 font-medium hover:underline">Privacy Policy</a>
           </label>
-          {errors.terms && (
-            <p className="text-sm text-red-500 mt-1.5 flex items-center gap-1.5">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {errors.terms}
-            </p>
-          )}
+        </div>
+        {errors.terms && <p className="text-xs text-red-500 -mt-2 ml-7">{errors.terms}</p>}
+
+
+        <PortalButton type="submit" loading={loading} className="w-full text-base">
+          Create Account
+          <ArrowRight className="w-4 h-4 opacity-80" />
+        </PortalButton>
+
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-100"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase tracking-wider text-slate-400 font-medium">
+            <span className="bg-white px-3">Already a member?</span>
+          </div>
         </div>
 
-        <div className="pt-2">
-          <PortalButton type="submit" loading={loading}>
-            Submit Access Request
-          </PortalButton>
-        </div>
-
-        <p className="text-center text-sm text-slate-600 pt-2">
-          Already have an account?{" "}
-          <Link
-            href="/portal/login"
-            className="text-orange-600 hover:text-orange-700 font-medium transition-colors"
-          >
-            Sign In
+        <div className="text-center">
+          <Link href="/portal/login" className="text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors">
+            Sign in to your account
           </Link>
-        </p>
+        </div>
       </form>
     </AuthLayout>
   );

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { fullName, company, email, phone, password } = parsed.data;
+    const { fullName, email, password } = parsed.data;
 
     await dbConnect();
 
@@ -45,12 +45,11 @@ export async function POST(request: Request) {
 
     await User.create({
       name: fullName.trim(),
-      company: company.trim(),
       email: email.toLowerCase(),
-      phone: phone.trim(),
       password: hashedPassword,
       role: "user",
       status: "pending",
+      // Company and Phone are now optional/omitted at signup
     });
 
     return NextResponse.json(
@@ -60,7 +59,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[register-error]", error);
     return NextResponse.json(
-      { message: "Unable to submit your request. Please try again shortly." },
+      {
+        message: "Unable to submit your request.",
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 },
     );
   }

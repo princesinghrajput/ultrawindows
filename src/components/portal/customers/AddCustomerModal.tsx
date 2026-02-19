@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Save, Building2, User, Phone, Mail, MapPin, Calculator, Settings } from "lucide-react";
 import FormInput from "@/components/portal/FormInput";
 import GlassPricesModal from "./GlassPricesModal";
@@ -10,12 +10,14 @@ interface AddCustomerModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (data: any) => Promise<void>;
+    customer?: any;
 }
 
 export default function AddCustomerModal({
     isOpen,
     onClose,
     onSave,
+    customer
 }: AddCustomerModalProps) {
     const [activeTab, setActiveTab] = useState<"details" | "pricing">("details");
     const [loading, setLoading] = useState(false);
@@ -48,6 +50,46 @@ export default function AddCustomerModal({
     const [showGlassModal, setShowGlassModal] = useState(false);
     const [showOverridesModal, setShowOverridesModal] = useState(false);
 
+    useEffect(() => {
+        if (isOpen && customer) {
+            setFormData({
+                name: customer.name || "",
+                contactName: customer.contactName || "",
+                email: customer.email || "",
+                phone: customer.phone || "",
+                address: customer.address || "",
+                postcode: customer.postcode || "",
+            });
+            setPricingData({
+                pricingType: customer.pricingType || "Trade",
+                markups: {
+                    allProducts: customer.markups?.allProducts || 0,
+                    aluminium: customer.markups?.aluminium || 0,
+                    roofProducts: customer.markups?.roofProducts || 0,
+                    glass: customer.markups?.glass || 0,
+                },
+            });
+            setCustomGlassPrices(customer.customGlassPrices || []);
+            setPriceOverrides(customer.priceOverrides || []);
+        } else if (isOpen && !customer) {
+            // Reset if adding new
+            setFormData({
+                name: "",
+                contactName: "",
+                email: "",
+                phone: "",
+                address: "",
+                postcode: "",
+            });
+            setPricingData({
+                pricingType: "Trade",
+                markups: { allProducts: 0, aluminium: 0, roofProducts: 0, glass: 0 },
+            });
+            setCustomGlassPrices([]);
+            setPriceOverrides([]);
+        }
+    }, [isOpen, customer]);
+
     if (!isOpen) return null;
 
     const handleSubmit = async () => {
@@ -60,7 +102,6 @@ export default function AddCustomerModal({
                 priceOverrides,
             };
             await onSave(payload);
-            onClose();
         } catch (error) {
             console.error("Failed to save customer", error);
         } finally {
@@ -75,8 +116,8 @@ export default function AddCustomerModal({
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b border-slate-100">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Create Customer</h2>
-                            <p className="text-sm text-slate-500">Add a new customer profile</p>
+                            <h2 className="text-xl font-semibold text-slate-900">{customer ? "Edit Customer" : "Create Customer"}</h2>
+                            <p className="text-sm text-slate-500">{customer ? "Update customer profile" : "Add a new customer profile"}</p>
                         </div>
                         <button
                             onClick={onClose}
@@ -91,8 +132,8 @@ export default function AddCustomerModal({
                         <button
                             onClick={() => setActiveTab("details")}
                             className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === "details"
-                                    ? "bg-white text-orange-600 shadow-sm ring-1 ring-slate-200"
-                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                                ? "bg-white text-orange-600 shadow-sm ring-1 ring-slate-200"
+                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                                 }`}
                         >
                             <Building2 className="w-4 h-4" />
@@ -101,8 +142,8 @@ export default function AddCustomerModal({
                         <button
                             onClick={() => setActiveTab("pricing")}
                             className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === "pricing"
-                                    ? "bg-white text-orange-600 shadow-sm ring-1 ring-slate-200"
-                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                                ? "bg-white text-orange-600 shadow-sm ring-1 ring-slate-200"
+                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                                 }`}
                         >
                             <Calculator className="w-4 h-4" />

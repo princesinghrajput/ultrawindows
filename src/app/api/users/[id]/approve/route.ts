@@ -18,7 +18,7 @@ export async function PUT(
         const { role, companyId } = body;
 
         // Validate
-        if (!role || !["user", "admin"].includes(role)) {
+        if (!role || !["user", "admin", "staff"].includes(role)) {
             return NextResponse.json({ message: "Invalid role" }, { status: 400 });
         }
 

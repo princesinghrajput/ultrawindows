@@ -23,7 +23,7 @@ const navItems = [
     { href: "/portal/pending-orders", label: "Pending Orders", icon: Clock, badge: 8 },
     { href: "/portal/orders", label: "All Orders", icon: Package },
     { href: "/portal/customers", label: "Customers", icon: Users },
-    { href: "/portal/users", label: "Team", icon: UserCog },
+    { href: "/portal/users", label: "Users", icon: UserCog },
     { href: "/portal/help", label: "Help", icon: HelpCircle },
 ];
 

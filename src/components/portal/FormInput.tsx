@@ -29,13 +29,14 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                         ref={ref}
                         type={isPassword && showPassword ? "text" : type}
                         className={`
-              w-full px-4 py-3 rounded-xl border border-slate-200 
-              bg-slate-50/50 text-slate-900 placeholder:text-slate-400
-              focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500
+              w-full px-4 py-3 rounded-xl border border-transparent 
+              bg-slate-50 text-slate-900 placeholder:text-slate-400 text-base
+              focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/10 focus:border-orange-500
+              hover:bg-slate-100 focus:hover:bg-white
               transition-all duration-200
               ${icon ? "pl-11" : ""}
               ${isPassword ? "pr-11" : ""}
-              ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500/20" : ""}
+              ${error ? "bg-red-50 text-red-900 placeholder:text-red-300 focus:border-red-500 focus:ring-red-500/10" : ""}
               ${className}
             `}
                         {...props}

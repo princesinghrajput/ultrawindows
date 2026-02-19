@@ -6,20 +6,20 @@ declare module "next-auth" {
       id: string;
       name?: string | null;
       email?: string | null;
-      role: "user" | "admin";
+      role: "user" | "admin" | "staff";
       status: "pending" | "approved" | "rejected";
     };
   }
 
   interface User {
-    role: "user" | "admin";
+    role: "user" | "admin" | "staff";
     status: "pending" | "approved" | "rejected";
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role?: "user" | "admin";
+    role?: "user" | "admin" | "staff";
     status?: "pending" | "approved" | "rejected";
   }
 }
