@@ -210,6 +210,28 @@ export interface FixedConfig extends BaseConfig {
   location?: string;
 }
 
+export interface BayConfig extends BaseConfig {
+  type: ProductType.Bay;
+  frameSystem: "standard" | "flush";
+  numberOfPanes: number;
+  bayHeight: number;
+  lengths: number[];
+  angles: number[];
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  location?: string;
+}
+
 export interface RoofConfig extends BaseConfig {
   type: ProductType.Rooflight | ProductType.Lantern;
   bars: number;
@@ -222,5 +244,6 @@ export type ProductConfig =
   | WindowConfig
   | ShapedConfig
   | FixedConfig
+  | BayConfig
   | RoofConfig
   | BaseConfig;

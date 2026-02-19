@@ -153,6 +153,16 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       }
       break;
     }
+
+    case ProductType.Bay: {
+      if (height < 300) {
+        return { isValid: false, message: "Bay window min height is 300mm" };
+      }
+      if (height > 3000) {
+        return { isValid: false, message: "Bay window max height is 3000mm" };
+      }
+      break;
+    }
   }
 
   return { isValid: true };
