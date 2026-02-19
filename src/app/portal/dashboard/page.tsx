@@ -13,6 +13,7 @@ import {
     ArrowDownRight,
     TrendingUp,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/portal/DashboardLayout";
 import ProductModal from "@/components/portal/ProductModal";
 
@@ -79,10 +80,11 @@ const colorMap: Record<string, { bg: string; icon: string; light: string }> = {
 };
 
 export default function DashboardPage() {
+    const router = useRouter();
     const [productModalOpen, setProductModalOpen] = useState(false);
 
     const handleProductSelect = (product: { id: string; name: string }) => {
-        console.log("Selected product:", product);
+        router.push(`/configurator?type=${product.id}`);
     };
 
     const maxRevenue = Math.max(...monthlyRevenue.map(m => m.value));

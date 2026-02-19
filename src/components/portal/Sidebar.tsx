@@ -24,6 +24,7 @@ const navItems = [
     { href: "/portal/orders", label: "All Orders", icon: Package },
     { href: "/portal/customers", label: "Customers", icon: Users },
     { href: "/portal/users", label: "Team", icon: UserCog },
+    { href: "/portal/help", label: "Help", icon: HelpCircle },
 ];
 
 interface SidebarProps {

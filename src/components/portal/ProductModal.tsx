@@ -25,7 +25,7 @@ const products = [
     category: "doors",
   },
   {
-    id: "slider",
+    id: "aluminium-slider",
     name: "Aluminium Slider 25mm Interlock",
     image: "/images/cortizo_patio.webp",
     category: "doors",

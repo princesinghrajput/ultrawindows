@@ -599,6 +599,10 @@ function ConfiguratorContent() {
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
+                        value={(config as any).location || ""}
+                        onChange={(e) =>
+                          updateConfig({ location: e.target.value } as any)
+                        }
                         placeholder="e.g. Kitchen, Living Room"
                         className="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm text-slate-600 placeholder:text-slate-300 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none transition-colors"
                       />
@@ -2592,10 +2596,10 @@ function ConfiguratorContent() {
                               } as any)
                             }
                             className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).outsideColor ===
-                                color.value &&
-                                !(config as RoofConfig).outsideRAL
-                                ? "bg-sky-50 border-sky-400"
-                                : "bg-white border-slate-200 hover:border-slate-300"
+                              color.value &&
+                              !(config as RoofConfig).outsideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200 hover:border-slate-300"
                               }`}
                           >
                             <div
@@ -2609,8 +2613,8 @@ function ConfiguratorContent() {
 
                         <div
                           className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).outsideRAL
-                              ? "bg-sky-50 border-sky-400"
-                              : "bg-white border-slate-200"
+                            ? "bg-sky-50 border-sky-400"
+                            : "bg-white border-slate-200"
                             }`}
                         >
                           <span className="text-xs text-slate-500 mb-1">
@@ -2659,10 +2663,10 @@ function ConfiguratorContent() {
                               } as any)
                             }
                             className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).insideColor ===
-                                color.value &&
-                                !(config as RoofConfig).insideRAL
-                                ? "bg-sky-50 border-sky-400"
-                                : "bg-white border-slate-200 hover:border-slate-300"
+                              color.value &&
+                              !(config as RoofConfig).insideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200 hover:border-slate-300"
                               }`}
                           >
                             <div
@@ -2676,8 +2680,8 @@ function ConfiguratorContent() {
 
                         <div
                           className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as RoofConfig).insideRAL
-                              ? "bg-sky-50 border-sky-400"
-                              : "bg-white border-slate-200"
+                            ? "bg-sky-50 border-sky-400"
+                            : "bg-white border-slate-200"
                             }`}
                         >
                           <span className="text-xs text-slate-500 mb-1">
