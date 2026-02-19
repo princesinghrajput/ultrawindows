@@ -14,6 +14,7 @@ import {
     TrendingUp,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/portal/DashboardLayout";
 import ProductModal from "@/components/portal/ProductModal";
 
@@ -81,6 +82,7 @@ const colorMap: Record<string, { bg: string; icon: string; light: string }> = {
 
 export default function DashboardPage() {
     const router = useRouter();
+    const { data: session } = useSession();
     const [productModalOpen, setProductModalOpen] = useState(false);
 
     const handleProductSelect = (product: { id: string; name: string }) => {
@@ -98,7 +100,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                     <h2 className="text-2xl font-semibold text-slate-900">
-                        Good afternoon, John
+                        {`Good afternoon, ${session?.user?.name?.split(" ")[0] ?? "there"}`}
                     </h2>
                     <p className="text-slate-500 mt-0.5">
                         Here&apos;s what&apos;s happening with your business today.

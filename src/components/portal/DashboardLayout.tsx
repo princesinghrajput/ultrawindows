@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import {
     Search,
     Bell,
@@ -37,6 +38,7 @@ export default function DashboardLayout({
     breadcrumbs,
 }: DashboardLayoutProps) {
     const pathname = usePathname();
+    const { data: session } = useSession();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -63,6 +65,14 @@ export default function DashboardLayout({
     })) || [];
 
     const unreadCount = notifications.filter(n => n.unread).length;
+    const displayName = session?.user?.name ?? "Portal User";
+    const roleLabel = session?.user?.role === "admin" ? "Admin" : "Customer";
+    const initials = displayName
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -174,11 +184,11 @@ export default function DashboardLayout({
                                     className="flex items-center gap-2 p-1.5 hover:bg-slate-100 rounded-lg"
                                 >
                                     <div className="w-8 h-8 rounded-full bg-orange-500 text-white text-sm font-medium flex items-center justify-center">
-                                        JD
+                                        {initials || "U"}
                                     </div>
                                     <div className="hidden lg:block text-left">
-                                        <p className="text-sm font-medium text-slate-900">John Doe</p>
-                                        <p className="text-xs text-slate-500">Admin</p>
+                                        <p className="text-sm font-medium text-slate-900">{displayName}</p>
+                                        <p className="text-xs text-slate-500">{roleLabel}</p>
                                     </div>
                                 </button>
 
@@ -193,9 +203,14 @@ export default function DashboardLayout({
                                             </Link>
                                         </div>
                                         <div className="p-2 border-t border-slate-100">
-                                            <Link href="/portal/login" className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
+                                            <button
+                                                onClick={() =>
+                                                    signOut({ callbackUrl: "/portal/login", redirect: true })
+                                                }
+                                                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+                                            >
                                                 <LogOut className="w-4 h-4" /> Sign Out
-                                            </Link>
+                                            </button>
                                         </div>
                                     </div>
                                 )}

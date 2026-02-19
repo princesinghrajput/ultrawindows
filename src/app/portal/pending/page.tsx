@@ -86,11 +86,22 @@ export default function PendingPage() {
                             </div>
 
                             {/* Status Box */}
-                            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 mb-6">
-                                <p className="text-sm text-amber-800 text-center">
-                                    Your account has been created successfully, but requires
-                                    approval before you can access the portal.
-                                </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                        Account Status
+                                    </p>
+                                    <p className="text-lg font-semibold text-amber-600 mt-1">
+                                        Pending Review
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-2">
+                                        This usually takes a few hours during business days.
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+                                    Your access request has been received. We&apos;ll send you an email once
+                                    the team verifies your details.
+                                </div>
                             </div>
 
                             {/* What happens next */}
@@ -125,6 +136,9 @@ export default function PendingPage() {
                                         (demo: {countdown}s)
                                     </span>
                                 </span>
+                                <p className="mt-2 text-xs text-slate-400">
+                                    You may close this page. We&apos;ll notify you via email once approved.
+                                </p>
                             </div>
                         </>
                     ) : (
@@ -148,10 +162,23 @@ export default function PendingPage() {
                             </div>
 
                             {/* Status Box */}
-                            <div className="p-4 rounded-xl bg-green-50 border border-green-200 mb-6">
-                                <p className="text-sm text-green-800 text-center font-medium">
-                                    Welcome to the Ultra Windows Customer Portal!
-                                </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                                        Account Status
+                                    </p>
+                                    <p className="text-lg font-semibold text-emerald-600 mt-1">
+                                        Approved
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-2">
+                                        Redirecting you to the dashboard. This only takes a moment.
+                                    </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-green-50 border border-green-200">
+                                    <p className="text-sm text-green-800 text-center font-medium">
+                                        Welcome to the Ultra Windows Customer Portal!
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Loading bar */}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import NextAuthSessionProvider from "@/components/providers/SessionProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -64,9 +65,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <NextAuthSessionProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );
 }
-
