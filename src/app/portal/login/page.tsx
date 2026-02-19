@@ -31,7 +31,7 @@ export default function LoginPage() {
       return true;
     }
     const fieldErrors: Record<string, string> = {};
-    validation.error.errors.forEach((issue) => {
+    validation.error.issues.forEach((issue) => {
       if (issue.path[0]) {
         fieldErrors[issue.path[0] as string] = issue.message;
       }

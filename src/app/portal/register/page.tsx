@@ -35,7 +35,7 @@ export default function RegisterPage() {
       return true;
     }
     const nextErrors: Record<string, string> = {};
-    parsed.error.errors.forEach((issue) => {
+    parsed.error.issues.forEach((issue) => {
       console.log(issue);
       if (issue.path[0]) {
         nextErrors[issue.path[0] as string] = issue.message;
@@ -75,26 +75,26 @@ export default function RegisterPage() {
     }, 1800);
   };
 
-    // Password strength indicator
-    const getPasswordStrength = () => {
-        const { password } = formData;
-        if (!password) return { strength: 0, label: "", color: "" };
+  // Password strength indicator
+  const getPasswordStrength = () => {
+    const { password } = formData;
+    if (!password) return { strength: 0, label: "", color: "" };
 
-        let strength = 0;
-        if (password.length >= 8) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
 
-        const levels = [
-            { label: "Weak", color: "bg-red-500" },
-            { label: "Fair", color: "bg-orange-500" },
-            { label: "Good", color: "bg-yellow-500" },
-            { label: "Strong", color: "bg-green-500" },
-        ];
+    const levels = [
+      { label: "Weak", color: "bg-red-500" },
+      { label: "Fair", color: "bg-orange-500" },
+      { label: "Good", color: "bg-yellow-500" },
+      { label: "Strong", color: "bg-green-500" },
+    ];
 
-        return { strength, ...levels[Math.min(strength - 1, 3)] };
-    };
+    return { strength, ...levels[Math.min(strength - 1, 3)] };
+  };
 
   const passwordStrength = getPasswordStrength();
 
