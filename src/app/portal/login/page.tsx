@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Mail, Lock } from "lucide-react";
 import AuthLayout from "@/components/portal/AuthLayout";
 import FormInput from "@/components/portal/FormInput";
@@ -42,9 +42,6 @@ export default function LoginPage() {
 
   const mapAuthError = (code?: string, fallback?: string) => {
     switch (code) {
-      case "account_pending":
-        setServerTone("warning");
-        return "Your account is awaiting approval. You will gain access once our team verifies your request.";
       case "account_rejected":
         setServerTone("warning");
         return "Your access request was rejected. Please contact support for next steps.";
@@ -85,6 +82,17 @@ export default function LoginPage() {
 
     if (result.error) {
       setServerMessage(mapAuthError(result.code ?? undefined, result.error));
+      return;
+    }
+
+    const refreshedSession = await getSession();
+
+    if (refreshedSession?.user?.status === "pending") {
+      setServerTone("warning");
+      setServerMessage(
+        "Your account is awaiting approval. We'll notify you as soon as the review is complete.",
+      );
+      router.push("/portal/pending");
       return;
     }
 

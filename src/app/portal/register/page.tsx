@@ -36,6 +36,7 @@ export default function RegisterPage() {
     }
     const nextErrors: Record<string, string> = {};
     parsed.error.errors.forEach((issue) => {
+      console.log(issue);
       if (issue.path[0]) {
         nextErrors[issue.path[0] as string] = issue.message;
       }
@@ -69,7 +70,8 @@ export default function RegisterPage() {
     setServerMessage(null);
 
     setTimeout(() => {
-      router.push("/portal/pending");
+      const search = new URLSearchParams({ email: formData.email }).toString();
+      router.push(`/portal/pending?${search}`);
     }, 1800);
   };
 

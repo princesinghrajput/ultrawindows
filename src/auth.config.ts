@@ -7,7 +7,6 @@ import User from "@/models/User";
 import { loginSchema } from "@/lib/validation/auth";
 import {
   InvalidCredentialsError,
-  PendingApprovalError,
   RejectedAccountError,
 } from "@/lib/auth/errors";
 
@@ -41,10 +40,6 @@ export const authConfig: NextAuthConfig = {
           throw new InvalidCredentialsError();
         }
 
-        if (user.status === "pending") {
-          throw new PendingApprovalError();
-        }
-
         if (user.status === "rejected") {
           throw new RejectedAccountError();
         }
@@ -60,11 +55,17 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = (user as any).role;
-        token.status = (user as any).status;
+        const typedUser = user as { role?: string; status?: string };
+        token.role = typedUser.role;
+        token.status = typedUser.status;
       }
+
+      if (trigger === "update" && session?.user?.status) {
+        token.status = session.user.status;
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -74,26 +75,6 @@ export const authConfig: NextAuthConfig = {
         session.user.status = (token.status as string) ?? "pending";
       }
       return session;
-    },
-    authorized({ auth, request }) {
-      const pathname = request.nextUrl.pathname;
-      const publicPaths = [
-        "/portal",
-        "/portal/login",
-        "/portal/register",
-        "/portal/pending",
-        "/portal/reset-password",
-      ];
-
-      if (publicPaths.some((path) => pathname.startsWith(path))) {
-        return true;
-      }
-
-      if (pathname.startsWith("/portal")) {
-        return Boolean(auth?.user) && auth.user.status === "approved";
-      }
-
-      return true;
     },
   },
 };
