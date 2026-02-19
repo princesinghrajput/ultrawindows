@@ -137,6 +137,22 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       }
       break;
     }
+
+    case ProductType.Fixed: {
+      if (width < 300) {
+        return { isValid: false, message: "Fixed frame min width is 300mm" };
+      }
+      if (width > 5000) {
+        return { isValid: false, message: "Fixed frame max width is 5000mm" };
+      }
+      if (height < 300) {
+        return { isValid: false, message: "Fixed frame min height is 300mm" };
+      }
+      if (height > 3000) {
+        return { isValid: false, message: "Fixed frame max height is 3000mm" };
+      }
+      break;
+    }
   }
 
   return { isValid: true };
