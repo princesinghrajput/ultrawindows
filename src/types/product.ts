@@ -139,12 +139,107 @@ export interface DoorConfig extends BaseConfig {
 export interface WindowConfig extends BaseConfig {
   type: ProductType.Window;
   style: "casement" | "tilt_turn";
-  layout: string; // ID of a layout pattern (e.g., "fixed-opener-fixed")
+  windowStyle: string; // e.g., "style-1", "style-21" - ID from windowLayouts
+  frameSystem: "standard" | "flush";
+  configuration: string; // Legacy simple string, keeping for compatibility or simple serialization
+  paneConfigurations?: Record<string, string>; // Map of pane ID to type (e.g "0": "opener", "1": "fixed")
+  outsideColor: string;
+  insideColor: string;
+  hardwareColor: string;
+  transomBars: number;
+  astragalBars: number;
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure"
+  | "laminated"
+  | "clear"
+  | "obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  addons: {
+    left: string | null;
+    right: string | null;
+    top: string | null;
+  };
+}
+
+export interface ShapedConfig extends BaseConfig {
+  type: ProductType.Shaped;
+  shapeType: "gable" | "shaped_left" | "shaped_right" | "gable_upstand";
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
+  transomBars: number;
+  astragalBars: number;
+  transomBarPositions?: number[];
+  astragalBarPositions?: number[];
+  hardwareColor: string;
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  location?: string;
+}
+
+export interface FixedConfig extends BaseConfig {
+  type: ProductType.Fixed;
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
+  addons: { left: string | null; right: string | null; top: string | null };
+  transomBars: number;
+  astragalBars: number;
+  transomBarPositions?: number[];
+  astragalBarPositions?: number[];
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  location?: string;
+}
+
+export interface BayConfig extends BaseConfig {
+  type: ProductType.Bay;
+  frameSystem: "standard" | "flush";
+  numberOfPanes: number;
+  bayHeight: number;
+  lengths: number[];
+  angles: number[];
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  location?: string;
 }
 
 export interface RoofConfig extends BaseConfig {
   type: ProductType.Rooflight | ProductType.Lantern;
   bars: number;
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  location?: string;
 }
 
 export type ProductConfig =
@@ -152,5 +247,8 @@ export type ProductConfig =
   | SliderConfig
   | DoorConfig
   | WindowConfig
+  | ShapedConfig
+  | FixedConfig
+  | BayConfig
   | RoofConfig
   | BaseConfig;
