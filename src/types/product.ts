@@ -165,6 +165,29 @@ export interface WindowConfig extends BaseConfig {
   };
 }
 
+export interface ShapedConfig extends BaseConfig {
+  type: ProductType.Shaped;
+  shapeType: "gable" | "shaped_left" | "shaped_right" | "gable_upstand";
+  outsideColor: string;
+  insideColor: string;
+  outsideRAL?: string;
+  insideRAL?: string;
+  cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
+  transomBars: number;
+  astragalBars: number;
+  transomBarPositions?: number[];
+  astragalBarPositions?: number[];
+  hardwareColor: string;
+  glassType:
+  | "unglazed"
+  | "toughened"
+  | "toughened_obscure";
+  glassPattern?: string;
+  glassThickness?: number;
+  pas24?: boolean;
+  location?: string;
+}
+
 export interface RoofConfig extends BaseConfig {
   type: ProductType.Rooflight | ProductType.Lantern;
   bars: number;
@@ -175,5 +198,6 @@ export type ProductConfig =
   | SliderConfig
   | DoorConfig
   | WindowConfig
+  | ShapedConfig
   | RoofConfig
   | BaseConfig;

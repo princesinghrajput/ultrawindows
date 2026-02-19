@@ -11,6 +11,7 @@ import {
   DoorConfig,
   SliderConfig,
   WindowConfig,
+  ShapedConfig,
 } from "../../types/product";
 import BifoldVisualizer from "../../components/configurator/visualizers/RealisticBifoldVisualizer";
 import RealisticAluminiumWindowVisualizer from "../../components/configurator/visualizers/RealisticAluminiumWindowVisualizer";
@@ -24,6 +25,7 @@ import WindowStyleSelector from "../../components/configurator/sections/WindowSt
 import RealisticFrenchDoorVisualizer from "../../components/configurator/visualizers/RealisticFrenchDoorVisualizer";
 import RealisticSingleDoorVisualizer from "../../components/configurator/visualizers/RealisticSingleDoorVisualizer";
 import RealisticSliderVisualizer from "../../components/configurator/visualizers/RealisticSliderVisualizer";
+import RealisticShapedFrameVisualizer from "../../components/configurator/visualizers/RealisticShapedFrameVisualizer";
 import SidelightModal from "../../components/configurator/sections/SidelightModal";
 import { calculateBifoldPrice } from "../../utils/pricing";
 import PriceSummary from "../../components/configurator/PriceSummary";
@@ -239,6 +241,23 @@ function ConfiguratorContent() {
         glassType: "clear",
         addons: { left: null, right: null, top: null },
       } as WindowConfig);
+    } else if (type === ProductType.Shaped) {
+      setConfig({
+        ...baseConfig,
+        type: ProductType.Shaped,
+        shapeType: "gable",
+        width: 3000,
+        height: 500,
+        outsideColor: "white",
+        insideColor: "white",
+        cill: "90mm",
+        transomBars: 0,
+        astragalBars: 0,
+        hardwareColor: "chrome",
+        glassType: "toughened",
+        glassPattern: "Low E (1.0 u-value)",
+        pas24: false,
+      } as ShapedConfig);
     } else {
       setConfig({ ...baseConfig, type } as any);
     }
@@ -279,6 +298,8 @@ function ConfiguratorContent() {
       handleProductSelect(ProductType.Slider);
     } else if (typeParam === "window") {
       handleProductSelect(ProductType.Window);
+    } else if (typeParam === "shaped") {
+      handleProductSelect(ProductType.Shaped);
     } else {
       router.replace("/portal/quotes");
     }
@@ -400,6 +421,15 @@ function ConfiguratorContent() {
                       <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
                         <RealisticAluminiumWindowVisualizer
                           config={config as WindowConfig}
+                          width={config.width}
+                          height={config.height}
+                          view={view}
+                        />
+                      </div>
+                    ) : config.type === ProductType.Shaped ? (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-50 p-3">
+                        <RealisticShapedFrameVisualizer
+                          config={config as ShapedConfig}
                           width={config.width}
                           height={config.height}
                           view={view}
@@ -671,6 +701,592 @@ function ConfiguratorContent() {
                         })}
                       </div>
                     </SectionCard>
+                  </>
+                )}
+
+                {/* ── SHAPED FRAME CONTROLS ── */}
+                {config.type === ProductType.Shaped && (
+                  <>
+                    {/* Shape Type Selector */}
+                    <SectionCard title="Configuration">
+                      <div className="flex flex-wrap justify-center gap-4">
+                        {([
+                          {
+                            label: "Gable",
+                            value: "gable",
+                            icon: (
+                              <svg viewBox="0 0 80 60" className="w-16 h-12">
+                                <polygon
+                                  points="10,55 40,8 70,55"
+                                  fill="#475569"
+                                  stroke="#334155"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ),
+                          },
+                          {
+                            label: "Shaped Left",
+                            value: "shaped_left",
+                            icon: (
+                              <svg viewBox="0 0 80 60" className="w-16 h-12">
+                                <polygon
+                                  points="10,55 10,30 55,8 70,55"
+                                  fill="#475569"
+                                  stroke="#334155"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ),
+                          },
+                          {
+                            label: "Shaped Right",
+                            value: "shaped_right",
+                            icon: (
+                              <svg viewBox="0 0 80 60" className="w-16 h-12">
+                                <polygon
+                                  points="10,55 25,8 70,30 70,55"
+                                  fill="#475569"
+                                  stroke="#334155"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ),
+                          },
+                          {
+                            label: "Gable w/ Upstand",
+                            value: "gable_upstand",
+                            icon: (
+                              <svg viewBox="0 0 80 60" className="w-16 h-12">
+                                <polygon
+                                  points="10,55 10,38 40,8 70,38 70,55"
+                                  fill="#475569"
+                                  stroke="#334155"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ),
+                          },
+                        ] as { label: string; value: string; icon: React.ReactNode }[]).map(
+                          (shape) => (
+                            <button
+                              key={shape.value}
+                              onClick={() =>
+                                updateConfig({ shapeType: shape.value } as any)
+                              }
+                              className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl w-28 h-28 transition-all ${(config as ShapedConfig).shapeType ===
+                                  shape.value
+                                  ? "bg-sky-50 border-sky-400 ring-1 ring-sky-200"
+                                  : "bg-white border-slate-200 hover:border-slate-300"
+                                }`}
+                            >
+                              {shape.icon}
+                              <span className="text-xs font-medium text-slate-700 mt-2 text-center leading-tight">
+                                {shape.label}
+                              </span>
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </SectionCard>
+
+                    {/* Outside Frame Colour */}
+                    <SectionCard title="Outside Frame Colour">
+                      <div className="flex flex-wrap gap-3 items-start">
+                        {[
+                          { label: "White", value: "white", bg: "bg-gray-200" },
+                          { label: "Black", value: "black", bg: "bg-black" },
+                          { label: "Grey", value: "grey", bg: "bg-slate-600" },
+                        ].map((color) => (
+                          <button
+                            key={color.value}
+                            onClick={() =>
+                              updateConfig({
+                                outsideColor: color.value,
+                                outsideRAL: undefined,
+                              } as any)
+                            }
+                            className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as ShapedConfig).outsideColor ===
+                                color.value &&
+                                !(config as ShapedConfig).outsideRAL
+                                ? "bg-sky-50 border-sky-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                          >
+                            <div
+                              className={`w-full h-12 rounded-lg ${color.bg} border border-slate-300`}
+                            />
+                            <span className="text-xs font-semibold text-slate-700 mt-2">
+                              {color.label}
+                            </span>
+                          </button>
+                        ))}
+
+                        {/* RAL Colour Input */}
+                        <div
+                          className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as ShapedConfig).outsideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200"
+                            }`}
+                        >
+                          <span className="text-xs text-slate-500 mb-1">
+                            RAL Colour
+                          </span>
+                          <input
+                            type="text"
+                            value={(config as ShapedConfig).outsideRAL || "0000"}
+                            onChange={(e) =>
+                              updateConfig({
+                                outsideRAL: e.target.value,
+                                outsideColor: `RAL ${e.target.value}`,
+                              } as any)
+                            }
+                            className="w-full text-center border border-slate-200 rounded px-1 py-1 text-sm focus:outline-none focus:border-orange-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const ral =
+                                (config as ShapedConfig).outsideRAL || "0000";
+                              updateConfig({
+                                outsideRAL: ral,
+                                outsideColor: `RAL ${ral}`,
+                              } as any);
+                            }}
+                            className="mt-1 px-3 py-1 bg-orange-500 text-white text-xs rounded font-medium hover:bg-orange-600 transition-colors"
+                          >
+                            Add RAL
+                          </button>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Inside Frame Colour */}
+                    <SectionCard title="Inside Frame Colour">
+                      <div className="flex flex-wrap gap-3 items-start">
+                        {[
+                          { label: "White", value: "white", bg: "bg-gray-200" },
+                          { label: "Black", value: "black", bg: "bg-black" },
+                        ].map((color) => (
+                          <button
+                            key={color.value}
+                            onClick={() =>
+                              updateConfig({
+                                insideColor: color.value,
+                                insideRAL: undefined,
+                              } as any)
+                            }
+                            className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as ShapedConfig).insideColor ===
+                                color.value &&
+                                !(config as ShapedConfig).insideRAL
+                                ? "bg-sky-50 border-sky-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                          >
+                            <div
+                              className={`w-full h-12 rounded-lg ${color.bg} border border-slate-300`}
+                            />
+                            <span className="text-xs font-semibold text-slate-700 mt-2">
+                              {color.label}
+                            </span>
+                          </button>
+                        ))}
+
+                        {/* RAL Colour Input */}
+                        <div
+                          className={`flex flex-col items-center p-3 border-2 rounded-xl w-28 transition-all ${(config as ShapedConfig).insideRAL
+                              ? "bg-sky-50 border-sky-400"
+                              : "bg-white border-slate-200"
+                            }`}
+                        >
+                          <span className="text-xs text-slate-500 mb-1">
+                            RAL Colour
+                          </span>
+                          <input
+                            type="text"
+                            value={(config as ShapedConfig).insideRAL || "0000"}
+                            onChange={(e) =>
+                              updateConfig({
+                                insideRAL: e.target.value,
+                                insideColor: `RAL ${e.target.value}`,
+                              } as any)
+                            }
+                            className="w-full text-center border border-slate-200 rounded px-1 py-1 text-sm focus:outline-none focus:border-orange-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const ral =
+                                (config as ShapedConfig).insideRAL || "0000";
+                              updateConfig({
+                                insideRAL: ral,
+                                insideColor: `RAL ${ral}`,
+                              } as any);
+                            }}
+                            className="mt-1 px-3 py-1 bg-orange-500 text-white text-xs rounded font-medium hover:bg-orange-600 transition-colors"
+                          >
+                            Add RAL
+                          </button>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Cill */}
+                    <SectionCard title="Cill">
+                      <div className="flex flex-wrap justify-center gap-3">
+                        {[
+                          { label: "No Cill", value: "none", hasIcon: false },
+                          { label: "90mm", value: "90mm", hasIcon: true },
+                          { label: "150mm", value: "150mm", hasIcon: true },
+                          { label: "180mm", value: "180mm", hasIcon: true },
+                          { label: "230mm", value: "230mm", hasIcon: true },
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() =>
+                              updateConfig({ cill: opt.value } as any)
+                            }
+                            className={`flex flex-col items-center justify-center p-3 border-2 rounded-xl w-24 h-24 transition-all ${(config as ShapedConfig).cill === opt.value
+                                ? "bg-sky-50 border-sky-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                              }`}
+                          >
+                            {opt.hasIcon ? (
+                              <img
+                                src="/images/aluminium_bifolf/standard.png"
+                                className="w-12 h-8 object-contain mb-1"
+                                alt={opt.label}
+                              />
+                            ) : (
+                              <svg
+                                className="w-8 h-8 text-slate-400 mb-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            )}
+                            <span className="text-xs font-semibold text-slate-700">
+                              {opt.label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </SectionCard>
+
+                    {/* Transom Bars */}
+                    <SectionCard title="Transom Bars">
+                      <div className="space-y-4">
+                        {/* Horizontal Transom */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-slate-600">
+                            Door Horizontal Transom
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => {
+                                const current =
+                                  (config as ShapedConfig).transomBars || 0;
+                                if (current > 0)
+                                  updateConfig({
+                                    transomBars: current - 1,
+                                  } as any);
+                              }}
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium w-4 text-center">
+                              {(config as ShapedConfig).transomBars || 0}
+                            </span>
+                            <button
+                              onClick={() => {
+                                const current =
+                                  (config as ShapedConfig).transomBars || 0;
+                                updateConfig({
+                                  transomBars: current + 1,
+                                } as any);
+                              }}
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Vertical Astragal */}
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                          <span className="text-sm text-slate-600">
+                            Door Vertical Transom
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => {
+                                const current =
+                                  (config as ShapedConfig).astragalBars || 0;
+                                if (current > 0)
+                                  updateConfig({
+                                    astragalBars: current - 1,
+                                  } as any);
+                              }}
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium w-4 text-center">
+                              {(config as ShapedConfig).astragalBars || 0}
+                            </span>
+                            <button
+                              onClick={() => {
+                                const current =
+                                  (config as ShapedConfig).astragalBars || 0;
+                                updateConfig({
+                                  astragalBars: current + 1,
+                                } as any);
+                              }}
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    {/* Glass Type */}
+                    <SectionCard title="Glass Type">
+                      <div className="space-y-4">
+                        {/* PAS 24 & Glass Thickness */}
+                        <div className="pb-4 flex flex-col gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={
+                                (config as ShapedConfig).pas24 || false
+                              }
+                              onChange={(e) =>
+                                updateConfig({
+                                  pas24: e.target.checked,
+                                } as any)
+                              }
+                              className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                            />
+                            <span className="text-sm font-medium text-slate-700">
+                              PAS 24 Certified
+                            </span>
+                          </label>
+
+                          <div className="flex flex-col gap-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  (config as ShapedConfig).glassThickness !==
+                                  undefined
+                                }
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    updateConfig({
+                                      glassThickness: 28,
+                                    } as any);
+                                  } else {
+                                    updateConfig({
+                                      glassThickness: undefined,
+                                    } as any);
+                                  }
+                                }}
+                                className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                              />
+                              <span className="text-sm font-medium text-slate-700">
+                                Specify Glass Thickness (if not 28mm)
+                              </span>
+                            </label>
+
+                            {(config as ShapedConfig).glassThickness !==
+                              undefined && (
+                                <div className="flex items-center gap-2 ml-6">
+                                  <span className="text-sm text-slate-600">
+                                    Glass Thickness
+                                  </span>
+                                  <input
+                                    type="number"
+                                    value={
+                                      (config as ShapedConfig).glassThickness ||
+                                      ""
+                                    }
+                                    onChange={(e) =>
+                                      updateConfig({
+                                        glassThickness:
+                                          parseInt(e.target.value) || 0,
+                                      } as any)
+                                    }
+                                    className="w-20 p-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-orange-500"
+                                  />
+                                  <span className="text-sm text-slate-600">
+                                    mm
+                                  </span>
+                                </div>
+                              )}
+                          </div>
+                        </div>
+
+                        {/* Glass Type Options */}
+                        <div className="flex flex-col gap-3">
+                          <span className="text-sm text-slate-600 font-medium">
+                            Glass Type
+                          </span>
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { label: "Unglazed", value: "unglazed" },
+                              { label: "Toughened", value: "toughened" },
+                              {
+                                label: "Toughened Obscured",
+                                value: "toughened_obscure",
+                              },
+                            ].map((opt) => (
+                              <button
+                                key={opt.value}
+                                onClick={() => {
+                                  let defaultPattern: string | null = null;
+                                  if (opt.value === "toughened")
+                                    defaultPattern = "Low E (1.0 u-value)";
+                                  if (opt.value === "toughened_obscure")
+                                    defaultPattern = "Satin";
+                                  updateConfig({
+                                    glassType: opt.value as any,
+                                    glassPattern: defaultPattern,
+                                  } as any);
+                                }}
+                                className={`py-2 px-3 text-sm rounded-lg border transition-all ${(config as ShapedConfig).glassType ===
+                                    opt.value
+                                    ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                  }`}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Glass Options for Toughened */}
+                        {(config as ShapedConfig).glassType ===
+                          "toughened" && (
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600 font-medium">
+                                Glass
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {[
+                                  "Low E (1.2 u-value)",
+                                  "6.8 Laminated (1.2 u-value)",
+                                  "Low E (1.0 u-value)",
+                                  "6.8 Acoustic Laminated (1.2 u-value)",
+                                  "Triple Glazed (0.6 u-value)",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({
+                                        glassPattern: opt,
+                                      } as any)
+                                    }
+                                    className={`p-3 text-sm flex items-center justify-center text-center border rounded-lg transition-all h-20 ${(config as ShapedConfig).glassPattern ===
+                                        opt
+                                        ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                        {/* Obscure Pattern Options */}
+                        {(config as ShapedConfig).glassType ===
+                          "toughened_obscure" && (
+                            <div className="flex flex-col gap-2">
+                              <span className="text-sm text-slate-600">
+                                Obscure Pattern
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                  "Arctic (L5)",
+                                  "Autumn (L3)",
+                                  "Contora (L4)",
+                                  "Cotswold (L5)",
+                                  "Reeded (L2)",
+                                  "Stippolyte (L4)",
+                                  "Cassini (L5)",
+                                  "Chantilly (L2)",
+                                  "Charcoal Sticks (L4)",
+                                  "Digital (L3)",
+                                  "Everglade (L5)",
+                                  "Flemish (L1)",
+                                  "Florielle (L4)",
+                                  "Mayflower (L4)",
+                                  "Minster (L2)",
+                                  "Oak (L4)",
+                                  "Pelerine (L4)",
+                                  "Sycamore (L2)",
+                                  "Taffeta (L3)",
+                                  "Warwick (L1)",
+                                  "Satin",
+                                ].map((opt) => (
+                                  <button
+                                    key={opt}
+                                    onClick={() =>
+                                      updateConfig({
+                                        glassPattern: opt,
+                                      } as any)
+                                    }
+                                    className={`p-2 text-xs border rounded-lg transition-all ${(config as ShapedConfig).glassPattern ===
+                                        opt
+                                        ? "bg-sky-50 border-sky-400 text-sky-700 font-medium"
+                                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                      }`}
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                      </div>
+                    </SectionCard>
+
+                    {/* Notes */}
+                    <SectionCard title="Notes">
+                      <div>
+                        <textarea
+                          value={config.notes || ""}
+                          onChange={(e) =>
+                            updateConfig({ notes: e.target.value } as any)
+                          }
+                          placeholder="Add any notes to the item here"
+                          className="w-full h-24 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-y"
+                        />
+                      </div>
+                    </SectionCard>
+
+                    {/* Validation */}
+                    {!validation.isValid && (
+                      <div className="text-red-600 text-sm font-medium bg-red-50 px-4 py-3 rounded-lg border border-red-100">
+                        <p className="font-semibold mb-1">
+                          Invalid configuration, please go back and change the
+                          options to satisfy this criteria
+                        </p>
+                        <ul className="list-disc ml-4">
+                          <li>{validation.message}</li>
+                        </ul>
+                      </div>
+                    )}
                   </>
                 )}
 

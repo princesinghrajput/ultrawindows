@@ -96,16 +96,16 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
       break;
     }
 
-        case ProductType.SingleDoor: {
-            if (width > 1200) {
-                return { isValid: false, message: `Single door max width is 1200mm, currently ${width}mm` };
-            }
-            if (width < 600) {
-                return { isValid: false, message: `Single door min width is 600mm, currently ${width}mm` };
-            }
-            if (height > 2500) return { isValid: false, message: 'Max height for single door is 2500mm' };
-            break;
-        }
+    case ProductType.SingleDoor: {
+      if (width > 1200) {
+        return { isValid: false, message: `Single door max width is 1200mm, currently ${width}mm` };
+      }
+      if (width < 600) {
+        return { isValid: false, message: `Single door min width is 600mm, currently ${width}mm` };
+      }
+      if (height > 2500) return { isValid: false, message: 'Max height for single door is 2500mm' };
+      break;
+    }
 
     case ProductType.Slider:
       if (width < 1000) {
@@ -121,6 +121,22 @@ export const validateDimensions = (config: ProductConfig): ValidationResult => {
         return { isValid: false, message: "Max height is 2768mm" };
       }
       break;
+
+    case ProductType.Shaped: {
+      if (width < 500) {
+        return { isValid: false, message: "Shaped frame min width is 500mm" };
+      }
+      if (width > 5000) {
+        return { isValid: false, message: "Shaped frame max width is 5000mm" };
+      }
+      if (height < 200) {
+        return { isValid: false, message: "Shaped frame min height is 200mm" };
+      }
+      if (height > 3000) {
+        return { isValid: false, message: "Shaped frame max height is 3000mm" };
+      }
+      break;
+    }
   }
 
   return { isValid: true };
