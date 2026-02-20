@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,7 +8,7 @@ import { useSession, signOut } from "next-auth/react";
 import { Mail, LogOut, RefreshCcw, ShieldCheck } from "lucide-react";
 import PortalButton from "@/components/portal/PortalButton";
 
-export default function PendingPage() {
+function PendingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedEmail = searchParams.get("email");
@@ -226,5 +226,19 @@ export default function PendingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PendingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+          <div className="text-slate-500">Loading...</div>
+        </div>
+      }
+    >
+      <PendingPageContent />
+    </Suspense>
   );
 }

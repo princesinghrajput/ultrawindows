@@ -23,7 +23,7 @@ export const authConfig: NextAuthConfig = {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) {
           throw new InvalidCredentialsError(
-            parsed.error.errors[0]?.message ?? "Invalid email or password.",
+            parsed.error.issues[0]?.message ?? "Invalid email or password.",
           );
         }
 
@@ -71,8 +71,8 @@ export const authConfig: NextAuthConfig = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? "";
-        session.user.role = (token.role as string) ?? "user";
-        session.user.status = (token.status as string) ?? "pending";
+        session.user.role = (token.role as "user" | "admin" | "staff") ?? "user";
+        session.user.status = (token.status as "pending" | "approved" | "rejected") ?? "pending";
       }
       return session;
     },
