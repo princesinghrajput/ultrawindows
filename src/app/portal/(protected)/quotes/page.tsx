@@ -1,50 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Calendar, MoreHorizontal, FileText } from "lucide-react";
+import { Plus, Search, MoreHorizontal, FileText } from "lucide-react";
 import DashboardLayout from "@/components/portal/DashboardLayout";
 import DataTable, { Column, StatusBadge } from "@/components/portal/DataTable";
 import ProductModal from "@/components/portal/ProductModal";
+import type { Quote } from "@/types/quote";
+import type { ProductConfig } from "@/types/product";
 
-interface Quote {
-    id: string;
-    quoteNumber: string;
-    created: string;
-    customer: string;
-    reference: string;
-    products: number;
-    total: string;
-    status: "draft" | "pending" | "approved" | "completed" | "cancelled";
-}
+const formatCurrency = (value?: number | null) => {
+    const amount = typeof value === "number" ? value : 0;
+    return new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: "GBP",
+        minimumFractionDigits: 2,
+    }).format(amount);
+};
 
-const mockQuotes: Quote[] = [
-    { id: "1", quoteNumber: "Q-2024-0042", created: "08/02/2024", customer: "ABC Construction Ltd", reference: "Project Alpha", products: 3, total: "£4,250.00", status: "pending" },
-    { id: "2", quoteNumber: "Q-2024-0041", created: "07/02/2024", customer: "HomeStyle Properties", reference: "Renovation 2024", products: 5, total: "£8,750.00", status: "approved" },
-    { id: "3", quoteNumber: "Q-2024-0040", created: "06/02/2024", customer: "Modern Builds UK", reference: "New Build", products: 2, total: "£3,150.00", status: "draft" },
-    { id: "4", quoteNumber: "Q-2024-0039", created: "05/02/2024", customer: "Premium Homes", reference: "Extension", products: 4, total: "£6,200.00", status: "completed" },
-    { id: "5", quoteNumber: "Q-2024-0038", created: "04/02/2024", customer: "Sussex Windows Co", reference: "Stock Order", products: 8, total: "£12,400.00", status: "pending" },
-];
+const formatDate = (value?: string) => {
+    if (!value) return "-";
+    return new Date(value).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+};
+
+const getItemCount = (quote: Quote) => {
+    if (quote.items?.length) {
+        return quote.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+    }
+    return quote.configuration ? 1 : 0;
+};
+
+const getTotalAmount = (quote: Quote) =>
+    quote.grossTotal ?? quote.totalPrice ?? quote.netTotal ?? quote.netPrice ?? 0;
+
+const getLocation = (quote: Quote) => {
+    if (quote.location) return quote.location;
+    if (quote.items?.[0]?.location) return quote.items[0].location as string;
+    const configuration = quote.configuration as (ProductConfig & { location?: string }) | null;
+    return configuration?.location || "-";
+};
 
 const columns: Column<Quote>[] = [
     {
-        key: "quoteNumber",
+        key: "quoteId",
         label: "Quote",
         sortable: true,
         render: (quote) => (
             <div className="flex items-center gap-3">
                 <FileText className="w-4 h-4 text-slate-400" />
                 <div>
-                    <p className="font-medium text-slate-900">{quote.quoteNumber}</p>
-                    <p className="text-xs text-slate-400">{quote.reference}</p>
+                    <p className="font-medium text-slate-900">{quote.quoteId}</p>
+                    <p className="text-xs text-slate-400">{getLocation(quote)}</p>
                 </div>
             </div>
-        )
+        ),
     },
-    { key: "customer", label: "Customer", sortable: true },
-    { key: "created", label: "Created", sortable: true },
-    { key: "products", label: "Items", className: "text-center" },
-    { key: "total", label: "Total", sortable: true, className: "font-medium" },
+    {
+        key: "customer",
+        label: "Customer",
+        render: (quote) => (
+            <div>
+                <p className="text-sm text-slate-900 font-medium">
+                    {quote.customerDetails?.name || "-"}
+                </p>
+                {quote.customerDetails?.email && (
+                    <p className="text-xs text-slate-400">{quote.customerDetails.email}</p>
+                )}
+            </div>
+        ),
+    },
+    {
+        key: "createdAt",
+        label: "Created",
+        sortable: true,
+        render: (quote) => <span>{formatDate(quote.createdAt)}</span>,
+    },
+    {
+        key: "items",
+        label: "Items",
+        className: "text-center",
+        render: (quote) => <span>{getItemCount(quote)}</span>,
+    },
+    {
+        key: "total",
+        label: "Total",
+        className: "font-medium",
+        render: (quote) => <span>{formatCurrency(getTotalAmount(quote))}</span>,
+    },
     {
         key: "status",
         label: "Status",
@@ -52,24 +98,69 @@ const columns: Column<Quote>[] = [
     },
 ];
 
+const STATUS_CARDS = [
+    { key: "draft", label: "Draft" },
+    { key: "pending", label: "Pending" },
+    { key: "ordered", label: "Ordered" },
+    { key: "archived", label: "Archived" },
+] as const;
+
 export default function QuotesPage() {
     const router = useRouter();
     const [productModalOpen, setProductModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
+    const [quotes, setQuotes] = useState<Quote[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+        return () => clearTimeout(timeout);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const loadQuotes = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const params = new URLSearchParams();
+                if (debouncedSearch) params.set("search", debouncedSearch);
+                if (statusFilter) params.set("status", statusFilter);
+                const url = params.size ? `/api/quotes?${params.toString()}` : "/api/quotes";
+                const response = await fetch(url, { signal: controller.signal });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch quotes");
+                }
+                const data: Quote[] = await response.json();
+                setQuotes(data);
+            } catch (err) {
+                if ((err as Error).name === "AbortError") return;
+                setError(err instanceof Error ? err.message : "Failed to load quotes");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadQuotes();
+        return () => controller.abort();
+    }, [debouncedSearch, statusFilter]);
+
+    const statusSummary = useMemo(() =>
+        STATUS_CARDS.map((card) => {
+            const relatedQuotes = quotes.filter((quote) => quote.status === card.key);
+            const count = relatedQuotes.length;
+            const total = relatedQuotes.reduce((sum, quote) => sum + getTotalAmount(quote), 0);
+            return { ...card, count, total };
+        }),
+        [quotes]
+    );
 
     const handleProductSelect = (product: { id: string; name: string }) => {
-        // Navigate to configurator with selected product type
         router.push(`/configurator?type=${product.id}`);
     };
-
-    const filteredQuotes = mockQuotes.filter((quote) => {
-        const matchesSearch =
-            quote.quoteNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            quote.customer.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = !statusFilter || quote.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
 
     return (
         <DashboardLayout
@@ -84,7 +175,16 @@ export default function QuotesPage() {
                 </button>
             }
         >
-            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                {statusSummary.map((card) => (
+                    <div key={card.key} className="bg-white border border-slate-200 rounded-xl p-4">
+                        <p className="text-xs uppercase text-slate-500">{card.label}</p>
+                        <p className="text-2xl font-semibold text-slate-900">{card.count}</p>
+                        <p className="text-xs text-slate-400">{formatCurrency(card.total)}</p>
+                    </div>
+                ))}
+            </div>
+
             <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div className="relative flex-1 max-w-xs">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -97,11 +197,6 @@ export default function QuotesPage() {
                     />
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <input type="date" className="bg-transparent text-sm focus:outline-none" />
-                </div>
-
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -110,20 +205,29 @@ export default function QuotesPage() {
                     <option value="">All Status</option>
                     <option value="draft">Draft</option>
                     <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="completed">Completed</option>
+                    <option value="ordered">Ordered</option>
+                    <option value="archived">Archived</option>
                 </select>
             </div>
 
-            {/* Table */}
+            {error && (
+                <div className="mb-4 px-4 py-2 rounded-lg border border-red-200 bg-red-50 text-sm text-red-600">
+                    {error}
+                </div>
+            )}
+
             <DataTable
                 columns={columns}
-                data={filteredQuotes}
-                keyExtractor={(quote) => quote.id}
-                emptyMessage="No quotes found"
-                onRowClick={(quote) => console.log("View quote:", quote.id)}
+                data={quotes}
+                loading={loading}
+                keyExtractor={(quote) => quote._id || quote.quoteId}
+                emptyMessage={loading ? "Loading quotes..." : "No quotes found"}
+                onRowClick={(quote) => router.push(`/portal/quotes/${quote.quoteId}`)}
                 actions={(quote) => (
-                    <button className="p-1.5 rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                    <button
+                        className="p-1.5 rounded text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        aria-label={`Actions for ${quote.quoteId}`}
+                    >
                         <MoreHorizontal className="w-4 h-4" />
                     </button>
                 )}

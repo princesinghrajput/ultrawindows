@@ -12,6 +12,7 @@ interface DimensionsSectionProps {
     isSidelightModalOpen: boolean;
     onOpenSidelightModal: () => void;
     onCloseSidelightModal: () => void;
+    readOnly?: boolean;
 }
 
 export default function DimensionsSection({
@@ -21,6 +22,7 @@ export default function DimensionsSection({
     isSidelightModalOpen,
     onOpenSidelightModal,
     onCloseSidelightModal,
+    readOnly = false,
 }: DimensionsSectionProps) {
     return (
         <SectionCard title="Dimensions">
@@ -36,7 +38,13 @@ export default function DimensionsSection({
                             onChange={(e) =>
                                 onUpdate({ width: Number(e.target.value) })
                             }
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 pr-12 text-sm font-medium text-slate-800 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none transition-colors"
+                            readOnly={readOnly}
+                            disabled={readOnly}
+                            className={`w-full border rounded-lg px-3 py-2.5 pr-12 text-sm font-medium text-slate-800 focus:outline-none transition-colors ${
+                                readOnly
+                                    ? "border-slate-200 bg-slate-50 cursor-not-allowed"
+                                    : "border-slate-200 focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                            }`}
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded">
                             mm
@@ -54,7 +62,13 @@ export default function DimensionsSection({
                             onChange={(e) =>
                                 onUpdate({ height: Number(e.target.value) })
                             }
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 pr-12 text-sm font-medium text-slate-800 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none transition-colors"
+                            readOnly={readOnly}
+                            disabled={readOnly}
+                            className={`w-full border rounded-lg px-3 py-2.5 pr-12 text-sm font-medium text-slate-800 focus:outline-none transition-colors ${
+                                readOnly
+                                    ? "border-slate-200 bg-slate-50 cursor-not-allowed"
+                                    : "border-slate-200 focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                            }`}
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded">
                             mm
@@ -77,14 +91,21 @@ export default function DimensionsSection({
                             onUpdate({ location: e.target.value } as any)
                         }
                         placeholder="e.g. Kitchen, Living Room"
-                        className="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm text-slate-600 placeholder:text-slate-300 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none transition-colors"
+                        readOnly={readOnly}
+                        disabled={readOnly}
+                        className={`w-full border rounded-lg pl-9 pr-3 py-2.5 text-sm text-slate-600 placeholder:text-slate-300 focus:outline-none transition-colors ${
+                            readOnly
+                                ? "border-slate-200 bg-slate-50 cursor-not-allowed"
+                                : "border-slate-200 focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                        }`}
                     />
                 </div>
             </div>
 
             {/* Sidelights button for French Door & Single Door */}
-            {(config.type === ProductType.FrenchDoor ||
-                config.type === ProductType.SingleDoor) && (
+            {!readOnly &&
+                (config.type === ProductType.FrenchDoor ||
+                    config.type === ProductType.SingleDoor) && (
                     <div className="mt-4">
                         <button
                             onClick={onOpenSidelightModal}

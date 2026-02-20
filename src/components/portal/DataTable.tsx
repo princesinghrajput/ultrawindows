@@ -200,6 +200,8 @@ export function StatusBadge({ status }: { status: string }) {
         completed: "bg-emerald-50 text-emerald-600",
         processing: "bg-blue-50 text-blue-600",
         cancelled: "bg-red-50 text-red-600",
+        ordered: "bg-blue-50 text-blue-600",
+        archived: "bg-slate-100 text-slate-500",
     };
 
     return (

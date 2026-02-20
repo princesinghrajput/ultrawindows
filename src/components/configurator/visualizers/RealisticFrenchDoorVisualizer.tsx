@@ -110,30 +110,29 @@ const RealisticFrenchDoorVisualizer: React.FC<
           {(typeof config.trickleVents === "number"
             ? config.trickleVents > 0
             : config.trickleVents) && (
-            <div
-              className={`w-full h-4 mb-[1px] ${frameBg} relative shadow-sm z-20 shrink-0 mx-auto ${
-                !config.addons?.top ? "rounded-t-sm" : ""
-              }`}
-              style={{ width: "99%" }}
-            >
-              {typeof config.trickleVents === "number" &&
-              config.trickleVents > 0 ? (
-                Array.from({ length: config.trickleVents }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner"
-                    style={{
-                      left: `${(100 / (config.trickleVents as number)) * (i + 0.5)}%`,
-                      width: `${Math.min(20, 80 / (config.trickleVents as number))}%`,
-                      transform: "translateX(-50%)",
-                    }}
-                  />
-                ))
-              ) : (
-                <div className="absolute inset-x-4 top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner" />
-              )}
-            </div>
-          )}
+              <div
+                className={`w-full h-4 mb-[1px] ${frameBg} relative shadow-sm z-20 shrink-0 mx-auto ${!config.addons?.top ? "rounded-t-sm" : ""
+                  }`}
+                style={{ width: "99%" }}
+              >
+                {typeof config.trickleVents === "number" &&
+                  config.trickleVents > 0 ? (
+                  Array.from({ length: config.trickleVents }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner"
+                      style={{
+                        left: `${(100 / (config.trickleVents as number)) * (i + 0.5)}%`,
+                        width: `${Math.min(20, 80 / (config.trickleVents as number))}%`,
+                        transform: "translateX(-50%)",
+                      }}
+                    />
+                  ))
+                ) : (
+                  <div className="absolute inset-x-4 top-1 h-1.5 bg-black/40 border border-white/10 rounded-full shadow-inner" />
+                )}
+              </div>
+            )}
         </div>
 
         {/* Middle Section: Left Addon + Frame + Right Addon */}
