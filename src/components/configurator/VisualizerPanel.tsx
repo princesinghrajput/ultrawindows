@@ -24,13 +24,19 @@ import RooflightVisualizer from "./visualizers/RooflightVisualizer";
 interface VisualizerPanelProps {
     config: ProductConfig;
     view: "inside" | "outside";
-    onToggleView: () => void;
+    onToggleView?: () => void;
+    hideControls?: boolean;
+    className?: string;
+    containerHeight?: string;
 }
 
 export default function VisualizerPanel({
     config,
     view,
     onToggleView,
+    hideControls,
+    className,
+    containerHeight,
 }: VisualizerPanelProps) {
     const renderVisualizer = () => {
         switch (config.type) {
@@ -156,32 +162,34 @@ export default function VisualizerPanel({
     };
 
     return (
-        <div className="w-full xl:w-120 xl:shrink-0 xl:sticky xl:top-20 z-0">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className={className || "w-full xl:w-120 xl:shrink-0 xl:sticky xl:top-20 z-0"}>
+            <div className={`bg-white rounded-xl overflow-hidden ${hideControls ? '' : 'shadow-sm border border-slate-200'}`}>
                 {/* Visualizer Preview */}
                 <div
                     className="relative"
-                    style={{ height: "clamp(320px, 45vw, 480px)" }}
+                    style={{ height: containerHeight || "clamp(320px, 45vw, 480px)" }}
                 >
                     {renderVisualizer()}
                 </div>
 
                 {/* View Toggle Bar */}
-                <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between bg-white">
-                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Eye className="w-3.5 h-3.5" />
-                        <span className="font-medium">
-                            {view === "outside" ? "Outside" : "Inside"} View
-                        </span>
+                {!hideControls && onToggleView && (
+                    <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between bg-white">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <Eye className="w-3.5 h-3.5" />
+                            <span className="font-medium">
+                                {view === "outside" ? "Outside" : "Inside"} View
+                            </span>
+                        </div>
+                        <button
+                            onClick={onToggleView}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors"
+                        >
+                            <RotateCcw className="w-3 h-3" />
+                            Flip View
+                        </button>
                     </div>
-                    <button
-                        onClick={onToggleView}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors"
-                    >
-                        <RotateCcw className="w-3 h-3" />
-                        Flip View
-                    </button>
-                </div>
+                )}
             </div>
         </div>
     );
