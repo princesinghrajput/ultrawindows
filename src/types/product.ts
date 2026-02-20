@@ -20,7 +20,16 @@ export interface BaseConfig {
   color: string;
   glass: string;
   handleColor: string;
-  cill: "none" | "85mm" | "150mm" | "180mm" | "190mm" | "225mm" | "90mm" | "230mm" | "250mm";
+  cill:
+    | "none"
+    | "85mm"
+    | "150mm"
+    | "180mm"
+    | "190mm"
+    | "225mm"
+    | "90mm"
+    | "230mm"
+    | "250mm";
   trickleVents: boolean | number;
   extras: string[];
   notes: string;
@@ -39,16 +48,19 @@ export interface BifoldConfig extends BaseConfig {
   threshold: "standard" | "low" | "integrated";
   thresholdRamp?: "none" | "inside" | "outside" | "both";
   trickleVents: boolean | number;
+  ventPositions?: number[];
   transomBars: number; // Replaces transom boolean
+  transomBarPositions?: number[]; // Custom positions (percentages)
   astragalBars: number; // Vertical bars
+  astragalBarPositions?: number[]; // Custom positions (percentages)
   hardwareColor: string;
   glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure"
-  | "laminated"
-  | "clear"
-  | "obscure"; // Keeping old types for safety
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure"; // Keeping old types for safety
   glassPattern?: string;
   integralBlinds: boolean;
   pas24?: boolean;
@@ -74,11 +86,7 @@ export interface SliderConfig extends BaseConfig {
   transomBars: number;
   astragalBars: number;
   hardwareColor: string;
-  glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure"
-  | "clear";
+  glassType: "unglazed" | "toughened" | "toughened_obscure" | "clear";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
@@ -125,12 +133,12 @@ export interface DoorConfig extends BaseConfig {
     top: string | null;
   };
   glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure"
-  | "laminated"
-  | "clear"
-  | "obscure";
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
@@ -149,12 +157,12 @@ export interface WindowConfig extends BaseConfig {
   transomBars: number;
   astragalBars: number;
   glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure"
-  | "laminated"
-  | "clear"
-  | "obscure";
+    | "unglazed"
+    | "toughened"
+    | "toughened_obscure"
+    | "laminated"
+    | "clear"
+    | "obscure";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
@@ -178,10 +186,7 @@ export interface ShapedConfig extends BaseConfig {
   transomBarPositions?: number[];
   astragalBarPositions?: number[];
   hardwareColor: string;
-  glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure";
+  glassType: "unglazed" | "toughened" | "toughened_obscure";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
@@ -200,10 +205,7 @@ export interface FixedConfig extends BaseConfig {
   astragalBars: number;
   transomBarPositions?: number[];
   astragalBarPositions?: number[];
-  glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure";
+  glassType: "unglazed" | "toughened" | "toughened_obscure";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
@@ -222,10 +224,7 @@ export interface BayConfig extends BaseConfig {
   outsideRAL?: string;
   insideRAL?: string;
   cill: "none" | "90mm" | "150mm" | "180mm" | "230mm";
-  glassType:
-  | "unglazed"
-  | "toughened"
-  | "toughened_obscure";
+  glassType: "unglazed" | "toughened" | "toughened_obscure";
   glassPattern?: string;
   glassThickness?: number;
   pas24?: boolean;
